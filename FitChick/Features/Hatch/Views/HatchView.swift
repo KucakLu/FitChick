@@ -10,14 +10,36 @@ internal import Combine
 
 struct HatchView: View {
     @State private var currentStage = 0
+    @State private var isRotating: Bool = false
     
     let eggStages = ["EggStage1", "EggStage2", "EggStage3", "EggStage4"]
-    
     let timer = Timer.publish(every: 2.0, on: .main, in: .common).autoconnect()
     
     var body: some View {
         ZStack {
-    
+            LinearGradient(
+                colors: [
+                    AppColor.secondary0Surface,
+                    AppColor.secondary300Main
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+            
+            Image("RewardBg")
+                .ignoresSafeArea()
+                .scaleEffect(1.1)
+                .rotationEffect(.degrees(isRotating ? 360 : 0))
+                .animation(
+                    .linear(duration: 3)
+                    .repeatForever(autoreverses: false),
+                    value: isRotating
+                )
+                .onAppear {
+                    isRotating = true
+                }
+            
             VStack(spacing: 0) {
                 VStack(spacing: 12) {
                     Text("Hatch Me!")
@@ -43,7 +65,7 @@ struct HatchView: View {
                         .resizable()
                         .scaledToFill()
                         .offset(y: -20)
-                        .frame(width: 350, height: 340)
+                        .frame(width: 340, height: 340)
                         .zIndex(1)
                         .id(currentStage)
                         .transition(.opacity)
@@ -57,7 +79,7 @@ struct HatchView: View {
                 if currentStage < eggStages.count - 1 {
                     currentStage += 1
                 } else {
-                    // bakal next ke muncul ayam nya
+                    // muncul pet nya deh
                 }
             }
         }
