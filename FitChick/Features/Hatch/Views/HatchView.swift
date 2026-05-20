@@ -50,7 +50,7 @@ struct HatchView: View {
                         .font(AppFont.body)
                         .foregroundColor(AppColor.secondary500Dark)
                 }
-                .padding(.top, 60)
+                .padding(.top, 80)
                 
                 Spacer()
                 
@@ -65,7 +65,7 @@ struct HatchView: View {
                         .resizable()
                         .scaledToFill()
                         .offset(y: -20)
-                        .frame(width: 340, height: 340)
+                        .frame(width: 345, height: 340)
                         .zIndex(1)
                         .id(currentStage)
                         .transition(.opacity)
