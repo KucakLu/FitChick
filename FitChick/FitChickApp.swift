@@ -11,7 +11,8 @@ import SwiftUI
 struct FitChickApp: App {
     var body: some Scene {
         WindowGroup {
-            Onboarding()
+//            Onboarding()
+              HatchPage4s()
         }
     }
 }
