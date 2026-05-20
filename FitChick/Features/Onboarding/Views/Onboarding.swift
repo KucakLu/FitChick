@@ -9,7 +9,7 @@ import SwiftUI
 
 struct Onboarding: View {
     var body: some View {
-        Text("Hello, Fira!")
+        Text("Hello, Fira2!")
     }
 }
 
