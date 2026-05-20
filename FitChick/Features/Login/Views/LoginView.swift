@@ -40,8 +40,7 @@ struct LoginView: View {
                 },
                 onCompletion: { result in
                     switch result {
-                    case .success(let authResults):
-                        print("Authorisation successful: \(authResults)")
+                    case .success(let authorization): handleAppleSignIn(authorization: authorization)
                     case .failure(let error):
                         print("Authorisation failed: \(error.localizedDescription)")
                     }
@@ -55,6 +54,30 @@ struct LoginView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(AppColor.appBackground.ignoresSafeArea())
+    }
+    
+    private func handleAppleSignIn(authorization: ASAuthorization) {
+        if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+            let userId = appleIDCredential.user
+            let fullName = appleIDCredential.fullName?.givenName ?? ""
+            let email = appleIDCredential.email ?? ""
+            
+            KeychainManager.shared.save(key: "appleUserId", value: userId)
+            if !fullName.isEmpty { KeychainManager.shared.save(key: "appleUserFullName", value: fullName) }
+            if !email.isEmpty { KeychainManager.shared.save(key: "appleUserEmail", value: email) }
+            getUserData()
+        }
+    }
+    
+    private func getUserData() {
+        let userId = KeychainManager.shared.retrieve(key: "appleUserId")
+        let fullName = KeychainManager.shared.retrieve(key: "appleUserFullName")
+        let email = KeychainManager.shared.retrieve(key: "appleUserEmail")
+        
+        print("--- USER STORAGE DATA ---")
+        print("User ID: \(userId ?? "Unknown")")
+        print("Full Name: \(fullName ?? "Unknown")")
+        print("Email: \(email ?? "Unknown")")
     }
 }
 
