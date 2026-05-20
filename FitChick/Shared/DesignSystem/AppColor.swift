@@ -64,4 +64,8 @@ enum AppColor {
     static let success500Dark = Color("Success500Dark")
     static let success50Surface = Color("Success50Surface")
     static let success75 = Color("Success75")
+    
+    // MARK: - Other Variable
+    static let appBackground = secondary0Surface
+    
 }
