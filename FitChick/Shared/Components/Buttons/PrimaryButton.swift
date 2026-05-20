@@ -82,7 +82,7 @@ private struct PrimaryButtonStyle: ButtonStyle {
 }
 
 private enum PrimaryButtonSize {
-    static let contentWidth: CGFloat = 242
+    static let contentWidth: CGFloat = 320
     static let contentHeight: CGFloat = 46
     static let totalHeight: CGFloat = 54
 
