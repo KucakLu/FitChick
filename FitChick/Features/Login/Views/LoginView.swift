@@ -48,10 +48,10 @@ struct LoginView: View {
                 }
             )
             .signInWithAppleButtonStyle(.black)
-            .frame(height: 48)
+            .frame(width: 362, height: 48)
             .clipShape(Capsule())
             .padding(.horizontal, 16)
-            .padding(.bottom, 12)
+            .padding(.bottom, 24)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(AppColor.appBackground.ignoresSafeArea())
