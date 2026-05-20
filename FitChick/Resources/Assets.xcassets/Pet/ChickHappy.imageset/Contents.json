@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "ChickWink.svg",
+      "filename" : "ChickHappy.svg",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "ChickWink 1.svg",
+      "filename" : "ChickHappy 1.svg",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "ChickWink 2.svg",
+      "filename" : "ChickHappy 2.svg",
       "idiom" : "universal",
       "scale" : "3x"
     }
