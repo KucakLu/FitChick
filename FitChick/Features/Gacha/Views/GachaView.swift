@@ -32,7 +32,7 @@ struct GachaView: View {
                 HStack(alignment: .center, spacing: 12) {
                     Spacer()
                     
-                    IconButton(icon: Image(systemName: "xmark")) {
+                    DismissButton(variant: .neutral) {
                         dismiss()
                     }
                     Spacer()
