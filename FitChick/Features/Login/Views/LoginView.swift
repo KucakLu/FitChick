@@ -7,9 +7,11 @@
 
 
 import SwiftUI
+import SwiftData
 import AuthenticationServices
 
 struct LoginView: View {
+    @Environment(\.modelContext) private var modelContext
     @State private var navigateToConnectHealth = false
     
     var body: some View {
@@ -65,6 +67,7 @@ struct LoginView: View {
             if !fullName.isEmpty { KeychainManager.shared.save(key: "appleUserFullName", value: fullName) }
             if !email.isEmpty { KeychainManager.shared.save(key: "appleUserEmail", value: email) }
             getUserData()
+            saveUserToSwiftData(userId: userId)
         }
     }
     
@@ -78,6 +81,23 @@ struct LoginView: View {
         print("Full Name: \(fullName ?? "Unknown")")
         print("Email: \(email ?? "Unknown")")
     }
+    
+    private func saveUserToSwiftData(userId: String) {
+        let descriptor = FetchDescriptor<UserAccount>(predicate: #Predicate { $0.userId == userId })
+            do {
+                let existingUsers = try modelContext.fetch(descriptor)
+                if existingUsers.isEmpty {
+                    let newUser = UserAccount(userId: userId, petName: "", totalCoint: 0)
+                    modelContext.insert(newUser)
+                    try modelContext.save()
+                    print("New SwiftData account created for ID: \(userId)")
+                } else {
+                    print("Existing user detected, no new data needed.")
+                }
+            } catch {
+                print("Failed to process SwiftData: \(error.localizedDescription)")
+            }
+        }
 }
 
 #Preview {

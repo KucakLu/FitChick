@@ -11,12 +11,12 @@ import SwiftData
 
 @Model
 class UserAccount {
-    @Attribute(.unique) var idUser: String
+    @Attribute(.unique) var userId: String
     var petName: String
     var totalCoint: Int
     
-    init(idUser: String, petName: String = "Chick", totalCoint: Int = 0) {
-        self.idUser = idUser
+    init(userId: String, petName: String = "Chick", totalCoint: Int = 0) {
+        self.userId = userId
         self.petName = petName
         self.totalCoint = totalCoint
     }
