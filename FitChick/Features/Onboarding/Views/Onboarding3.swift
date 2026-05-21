@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct Onboarding3: View {
+    @State private var isShowingLogin = false
+    
     var body: some View {
         ZStack {
             AppColor.appBackground
@@ -29,12 +31,17 @@ struct Onboarding3: View {
                 .font(AppFont.body)
                 .foregroundColor(.neutral600Subtext)
                 PrimaryButton(title: "Next") {
-                    print("Next tapped")
+                    isShowingLogin = true
                 }
             }
             .padding(.bottom, 64)
             .ignoresSafeArea()
         }
+        .navigationDestination(isPresented: $isShowingLogin) {
+            LoginView()
+                .toolbar(.hidden, for: .navigationBar)
+        }
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
 
