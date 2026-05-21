@@ -31,11 +31,10 @@ struct GachaRewardView: View {
                 
                 Spacer()
                 
-                Button {
+                CollectRewardButton(title: "Tap to collect") {
                     handleTapSequence()
-                } label: {
-                    Text("Tap to collect")
                 }
+
                 .padding(.horizontal, 24)
                 .padding(.bottom, 94)
             }
