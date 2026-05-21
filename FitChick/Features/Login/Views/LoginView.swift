@@ -11,49 +11,41 @@ import AuthenticationServices
 
 struct LoginView: View {
     var body: some View {
-        VStack(spacing: 0) {
-            Spacer()
-            
-            Image("ChickHappy2")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 323, height: 338)
-                .padding(.bottom, 54)
+        ZStack {
+            AppColor.appBackground
+                .ignoresSafeArea()
             
             VStack(spacing: 24) {
-                Text("Login")
-                    .font(AppFont.title1Bold)
-                    .foregroundColor(AppColor.neutral800Text)
-                
+                Spacer()
+                Image("ChickHappy2")
+                Text("""
+                    Login
+                    """)
+                .multilineTextAlignment(.center)
+                .font(AppFont.title1Bold)
                 Text("Using your apple account\nto access the app")
-                    .font(AppFont.body)
-                    .foregroundColor(AppColor.neutral600Subtext)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(4)
-            }
-            .padding(.bottom, 40)
-            
-        
-            SignInWithAppleButton(
-                onRequest: { request in
-                    request.requestedScopes = [.fullName, .email]
-                },
-                onCompletion: { result in
-                    switch result {
-                    case .success(let authorization): handleAppleSignIn(authorization: authorization)
-                    case .failure(let error):
-                        print("Authorisation failed: \(error.localizedDescription)")
+                .multilineTextAlignment(.center)
+                .font(AppFont.body)
+                .foregroundColor(.neutral600Subtext)
+                SignInWithAppleButton(
+                    onRequest: { request in
+                        request.requestedScopes = [.fullName, .email]
+                    },
+                    onCompletion: { result in
+                        switch result {
+                        case .success(let authorization): handleAppleSignIn(authorization: authorization)
+                        case .failure(let error):
+                            print("Authorisation failed: \(error.localizedDescription)")
+                        }
                     }
-                }
-            )
-            .signInWithAppleButtonStyle(.black)
-            .frame(width: 362, height: 48)
-            .clipShape(Capsule())
-            .padding(.horizontal, 16)
-            .padding(.bottom, 24)
+                )
+                .signInWithAppleButtonStyle(.black)
+                .frame(width: 320, height: 46)
+                .clipShape(Capsule())
+            }
+            .padding(.bottom, 64)
+            .ignoresSafeArea()
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(AppColor.appBackground.ignoresSafeArea())
     }
     
     private func handleAppleSignIn(authorization: ASAuthorization) {
