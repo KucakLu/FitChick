@@ -67,5 +67,6 @@ enum AppColor {
     
     // MARK: - Other Variable
     static let appBackground = secondary0Surface
+    static let dashboardBackground = secondary100
 
 }
