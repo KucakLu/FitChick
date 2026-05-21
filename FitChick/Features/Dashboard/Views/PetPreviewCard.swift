@@ -11,13 +11,11 @@ struct PetPreviewCard: View {
     var body: some View {
         ZStack {
             Image("ShadowSpotlight")
-                .offset(y: 95)
-
-            Image("ChickIddle")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 191, height: 216)
-//                .padding(.bottom, 100)
+                .offset(y: 130)
+            
+            PetAnimationView(contentMode: .fit)
+//                .frame(width: 191, height: 216)
+                .scaleEffect(0.82, anchor: .bottom)
         }
     }
 }

@@ -12,51 +12,50 @@ struct DailyProgressSectionView: View {
     let stepGoal: Int
     
     var body: some View {
-        ZStack {
-            Rectangle()
-                .fill(AppColor.secondary50Surface)
-                .frame(width: 402, height: 406)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-                .ignoresSafeArea(.container, edges: .bottom)
-            
-            VStack(spacing: 16) {
-                VStack {
-                    HStack {
-                        Text("Your Daily Progress")
-                            .font(AppFont.title1Bold)
-                        Spacer()
+        Rectangle()
+            .fill(AppColor.secondary50Surface)
+            .frame(maxWidth: .infinity)
+            .frame(height: 406)
+            .overlay(alignment: .top) {
+                VStack(spacing: 16) {
+                    VStack {
+                        HStack {
+                            Text("Your Daily Progress")
+                                .font(AppFont.title1Bold)
+                            Spacer()
+                        }
+                        
+                        HStack {
+                            Text("Small steps, big changes")
+                                .font(AppFont.subheadline)
+                                .foregroundColor(AppColor.neutral600Subtext)
+                            Spacer()
+                        }
                     }
-                    
-                    HStack {
-                        Text("Small steps, big changes")
-                            .font(AppFont.subheadline)
-                            .foregroundColor(AppColor.neutral600Subtext)
-                        Spacer()
-                    }
-                }
-                .padding(.horizontal, 24)
-                .padding(.top, 8)
-                
-                ScrollView {
-                    HStack {
-                        Text("Distance")
-                            .font(AppFont.title3)
-                        Spacer()
-                    }
-                    .padding(.top, 8)
                     .padding(.horizontal, 24)
                     
-                    VStack(spacing: 16) {
-                        DailyProgressCardView(stepCount: stepCount, stepGoal: stepGoal)
-                        DailyProgressCardView(stepCount: stepCount, stepGoal: 10000)
+                    ScrollView {
+                        HStack {
+                            Text("Distance")
+                                .font(AppFont.title3)
+                            Spacer()
+                        }
+                        .padding(.top, 8)
+                        .padding(.horizontal, 24)
+                        
+                        VStack(spacing: 16) {
+                            DailyProgressCardView(stepCount: stepCount, stepGoal: stepGoal)
+                            DailyProgressCardView(stepCount: stepCount, stepGoal: 10000)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.bottom, 32)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.bottom, 32)
                 }
+                .padding(.top, 16)
+                .frame(maxWidth: .infinity)
             }
-            .padding(.top, 24)
-            .frame(maxWidth: .infinity)
-        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        .ignoresSafeArea(.container, edges: .bottom)
     }
 }
 

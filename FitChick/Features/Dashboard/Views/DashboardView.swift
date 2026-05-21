@@ -34,8 +34,8 @@ struct DashboardView: View {
                 DashboardHeaderView(coinCount: coinCount)
                 BubbleChatView(message: currentPetMessage)
                 
-                
                 PetPreviewCard()
+                    .frame(width: 191, height: 100)
                     .padding(.bottom, 24)
                 
                 DailyProgressSectionView(stepCount: stepCount, stepGoal: stepGoal)
