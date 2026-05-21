@@ -17,7 +17,7 @@ struct GachaView: View {
     
     var body: some View {
         // kalau cuman buat testing bisa di ubah disini yeah total koin sementaranya
-        let userTotalCoint = users.first?.totalCoint ?? 40
+        let userTotalCoint = users.first?.totalCoint ?? 50
         
         let isButton1xDisabled = userTotalCoint < 10
         let isButton5xDisabled = userTotalCoint < 50
@@ -75,6 +75,7 @@ struct GachaView: View {
                         isDisabled: isButton1xDisabled
                     ) {
                         executeGacha(cost: 10)
+                        
                     }
                     
                     ClaimRewardButton(
