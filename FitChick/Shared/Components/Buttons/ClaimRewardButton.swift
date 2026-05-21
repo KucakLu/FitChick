@@ -29,66 +29,78 @@ struct ClaimRewardButton: View {
     }
     
     var body: some View {
-            Button(action: {
-                if !isDisabled {
-                    action()
-                }
-            }) {
-                HStack(spacing: 0) {
-                    Image(isDisabled ? "RewardCoinDisabled" : "RewardCoin")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: ClaimButtonSize.coinIconSize, height: ClaimButtonSize.coinIconSize)
-                    
-                    Color.clear
-                        .frame(width: 4, height: 1)
-                    
-                    Text("\(coinAmount)")
-                        .font(AppFont.bodyBold)
-                        .kerning(AppFont.bodyBold.letterSpacing)
-                        .foregroundStyle(isDisabled ? AppColor.neutral500 : AppColor.secondary100)
-                    
-                    Spacer(minLength: 4)
-                    
-                    Text(claimText)
-                        .font(AppFont.bodyBold)
-                        .kerning(AppFont.bodyBold.letterSpacing)
-                        .foregroundStyle(isDisabled ? AppColor.neutral500 : .white)
-                        .lineLimit(1)
-                        .fixedSize(horizontal: true, vertical: false)
-                }
-                .padding(.horizontal, ClaimButtonSize.contentHorizontalPadding)
-                .frame(width: ClaimButtonSize.contentWidth, height: ClaimButtonSize.contentHeight, alignment: .leading)
+        Button(action: {
+            if !isDisabled {
+                action()
             }
-            .buttonStyle(ClaimButtonStyle(isDisabled: isDisabled, isSelected: isSelected))
-            .disabled(isDisabled)
+        }) {
+            HStack(spacing: 0) {
+                Image(isDisabled ? "RewardCoinDisabled" : "RewardCoin")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: ClaimButtonSize.coinIconSize, height: ClaimButtonSize.coinIconSize)
+                
+                Color.clear
+                    .frame(width: 4, height: 1)
+                
+                Text("\(coinAmount)")
+                    .font(AppFont.bodyBold)
+                    .kerning(AppFont.bodyBold.letterSpacing)
+                    .foregroundStyle(isDisabled ? AppColor.neutral400 : AppColor.secondary100)
+                
+                Spacer(minLength: 4)
+                
+                Text(claimText)
+                    .font(AppFont.bodyBold)
+                    .kerning(AppFont.bodyBold.letterSpacing)
+                    .foregroundStyle(isDisabled ? AppColor.neutral400 : .white)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+            }
+            .padding(.horizontal, ClaimButtonSize.contentHorizontalPadding)
         }
+        .buttonStyle(ClaimButtonStyle(isDisabled: isDisabled, isSelected: isSelected, coinAmount: coinAmount))
+        .disabled(isDisabled)
+    }
 }
 
 private struct ClaimButtonStyle: ButtonStyle {
     let isDisabled: Bool
     let isSelected: Bool
+    let coinAmount: Int
     
     func makeBody(configuration: Configuration) -> some View {
-        ZStack(alignment: .topLeading) {
-            bottomLayer(isPressed: configuration.isPressed)
+        ZStack(alignment: .center) {
+            
+            if !isDisabled {
+                if coinAmount == 50 {
+                    RoundedRectangle(cornerRadius: ClaimButtonSize.cornerRadius + 8)
+                        .stroke(AppColor.primary300Main.opacity(0.15), lineWidth: 16)
+                        .frame(width: ClaimButtonSize.contentWidth + 16, height: ClaimButtonSize.contentHeight + 16)
+                }
+                
+                RoundedRectangle(cornerRadius: ClaimButtonSize.cornerRadius + 4)
+                    .stroke(AppColor.primary400Border.opacity(0.3), lineWidth: 8)
+                    .frame(width: ClaimButtonSize.contentWidth + 8, height: ClaimButtonSize.contentHeight + 8)
+            }
             
             configuration.label
+                .frame(width: ClaimButtonSize.contentWidth, height: ClaimButtonSize.contentHeight, alignment: .leading)
                 .background {
-                    if !isDisabled {
-                        RoundedRectangle(cornerRadius: ClaimButtonSize.cornerRadius)
-                            .fill(backgroundHaloColor)
-                            .blur(radius: ClaimButtonSize.haloBlurRadius)
-                            .padding(-ClaimButtonSize.haloPadding)
-                    }
-                    
                     RoundedRectangle(cornerRadius: ClaimButtonSize.cornerRadius)
                         .fill(backgroundColor)
                 }
-                .offset(y: isDisabled ? 0 : (configuration.isPressed ? ClaimButtonSize.pressedOffset : 0))
+                .overlay {
+                    if !isDisabled {
+                        RoundedRectangle(cornerRadius: ClaimButtonSize.cornerRadius)
+                            .stroke(AppColor.primary400Border, lineWidth: 4)
+                            .offset(y: -4)
+                            .clipShape(RoundedRectangle(cornerRadius: ClaimButtonSize.cornerRadius))
+                    }
+                }
+                .opacity(configuration.isPressed && !isDisabled ? 0.9 : 1.0)
         }
-        .frame(height: ClaimButtonSize.totalHeight)
-        .animation(.easeInOut(duration: 0.08), value: configuration.isPressed)
+        .frame(width: ClaimButtonSize.contentWidth + 32, height: ClaimButtonSize.contentHeight + 32)
     }
     
     private var backgroundColor: Color {
@@ -100,79 +112,38 @@ private struct ClaimButtonStyle: ButtonStyle {
             return AppColor.primary300Main
         }
     }
-    
-    private var shadowColor: Color {
-        if isDisabled {
-            return Color.clear
-        } else if isSelected {
-            return AppColor.primary500Dark
-        } else {
-            return AppColor.primary400Border
-        }
-    }
-    
-    private var backgroundHaloColor: Color {
-        if isDisabled {
-            return Color.clear
-        } else {
-            return AppColor.primary100.opacity(0.15)
-        }
-    }
-    
-    private func bottomLayer(isPressed: Bool) -> some View {
-        RoundedRectangle(cornerRadius: ClaimButtonSize.cornerRadius)
-            .fill(shadowColor)
-            .frame(width: ClaimButtonSize.contentWidth, height: ClaimButtonSize.contentHeight)
-            .offset(y: isPressed ? ClaimButtonSize.pressedShadowOffset : ClaimButtonSize.defaultShadowOffset)
-    }
-    
-    private var highlight: some View {
-        RoundedRectangle(cornerRadius: 2)
-            .fill(.white.opacity(0.95))
-            .frame(width: 8, height: 3)
-            .padding(.leading, 6)
-            .padding(.top, 5)
-    }
 }
 
-private enum ClaimButtonSize {
+internal enum ClaimButtonSize {
     static let contentWidth: CGFloat = 110
     static let contentHeight: CGFloat = 44
-    static let totalHeight: CGFloat = 48
-    
     static let coinIconSize: CGFloat = 24
     static let contentHorizontalPadding: CGFloat = 12
-    
     static let cornerRadius: CGFloat = 14
-    static let haloBlurRadius: CGFloat = 6
-    static let haloPadding: CGFloat = 4
-    
-    static let defaultShadowOffset: CGFloat = 4
-    static let pressedShadowOffset: CGFloat = 4
-    static let pressedOffset: CGFloat = 2
 }
 
 #Preview {
-    VStack(spacing: 24) {
-        HStack(spacing: 16) {
-            ClaimRewardButton(coinAmount: 10, claimText: "1x") {
-                print("1x koin diklaim!")
-            }
-            
-            ClaimRewardButton(coinAmount: 50, claimText: "5x") {
-                print("5x koin diklaim!")
+    VStack(spacing: 40) {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 32) {
+                ClaimRewardButton(coinAmount: 10, claimText: "1x") {
+                    print("1x diklaim!")
+                }
+                
+                ClaimRewardButton(coinAmount: 50, claimText: "5x") {
+                    print("5x diklaim!")
+                }
             }
         }
         
-        HStack(spacing: 16) {
-            ClaimRewardButton(coinAmount: 10, claimText: "1x", isDisabled: true) {
-            }
-            
-            ClaimRewardButton(coinAmount: 50, claimText: "5x", isDisabled: true) {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 32) {
+                ClaimRewardButton(coinAmount: 10, claimText: "1x", isDisabled: true) {}
+                ClaimRewardButton(coinAmount: 50, claimText: "5x", isDisabled: true) {}
             }
         }
     }
-    .padding()
+    .padding(40)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(AppColor.appBackground.ignoresSafeArea())
 }
