@@ -9,7 +9,16 @@ import SwiftUI
 
 struct PetPreviewCard: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ZStack {
+            Image("ShadowSpotlight")
+                .offset(y: 95)
+
+            Image("ChickIddle")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 191, height: 216)
+//                .padding(.bottom, 100)
+        }
     }
 }
 
