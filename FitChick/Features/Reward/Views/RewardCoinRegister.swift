@@ -48,8 +48,11 @@ struct RewardCoinRegister: View {
                     }
                 }
                 .padding(.bottom, 120)
-                Text("Tap to collect the coin")
-                    .font(AppFont.bodyBold)
+                NavigationLink(destination: HatchView()) {
+                    Text("Tap to collect the coin")
+                        .font(AppFont.bodyBold)
+                        .foregroundColor(.black)
+                }
             }
         }
     }
