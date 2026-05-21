@@ -15,12 +15,14 @@ struct GachaView: View {
     
     @Query var users: [UserAccount]
     
+    @State private var showRewardView: Bool = false
+    @State private var selectedDrawType: Int = 1
+    
     var body: some View {
-        // kalau cuman buat testing bisa di ubah disini yeah total koin sementaranya
         let userTotalCoint = users.first?.totalCoint ?? 50
         
-        let isButton1xDisabled = userTotalCoint < 10
-        let isButton5xDisabled = userTotalCoint < 50
+        let isButton1xDisabled = userTotalCoint < 10 && !showRewardView
+        let isButton5xDisabled = userTotalCoint < 50 && !showRewardView
         
         ZStack {
             RewardAnimation()
@@ -74,17 +76,18 @@ struct GachaView: View {
                         claimText: "1x",
                         isDisabled: isButton1xDisabled
                     ) {
-                        executeGacha(cost: 10)
-                        
+                        executeGacha(cost: 10, drawCount: 1)
                     }
+                    .allowsHitTesting(!showRewardView)
                     
                     ClaimRewardButton(
                         coinAmount: 50,
                         claimText: "5x",
                         isDisabled: isButton5xDisabled
                     ) {
-                        executeGacha(cost: 50)
+                        executeGacha(cost: 50, drawCount: 5)
                     }
+                    .allowsHitTesting(!showRewardView)
                 }
                 
                 Spacer()
@@ -102,22 +105,37 @@ struct GachaView: View {
                 
                 Spacer()
             }
+            .fullScreenCover(isPresented: $showRewardView) {
+                        GachaRewardView(drawType: selectedDrawType)
+            }
         
         }
     }
-    private func executeGacha(cost: Int) {
+
+    private func executeGacha(cost: Int, drawCount: Int) {
         if let currentUser = users.first, currentUser.totalCoint >= cost {
-            withAnimation {
-                currentUser.totalCoint -= cost
-                try? modelContext.save()
-            }
-            print("Gacha successful! Deducted \(cost) coins. Remaining coins: \(currentUser.totalCoint)")
+            self.selectedDrawType = drawCount
+            self.showRewardView = true
+        
+            currentUser.totalCoint -= cost
+                do {
+                    try modelContext.save()
+                    print("Coins deducted successfully!")
+                } catch {
+                    print("Failed to save coin data: \(error.localizedDescription)")
+                }
         }
     }
 }
 
+// coba testing disini
 #Preview {
-    // Container SwiftData cuman buat keperluan Preview di Canvas yeah
-    GachaView()
-        .modelContainer(for: UserAccount.self, inMemory: true)
+    let container = try! ModelContainer(for: UserAccount.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+    
+    let dummyUser = UserAccount(userId: "", petName: "", totalCoint: 50)
+    
+    container.mainContext.insert(dummyUser)
+    
+    return GachaView()
+        .modelContainer(container)
 }

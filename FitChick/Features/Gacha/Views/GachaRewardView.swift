@@ -10,6 +10,7 @@ import SwiftUI
 struct GachaRewardView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var currentStep: Int = 1
+    let drawType: Int
     
     var body: some View {
         ZStack {
@@ -86,5 +87,5 @@ struct GachaRewardView: View {
 }
 
 #Preview {
-    GachaRewardView()
+    GachaRewardView(drawType: 5)
 }
