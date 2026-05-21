@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct RewardCoinRegister: View {
+    @AppStorage("coinCount") private var coinCount = 0
     @State private var isRotating: Bool = false
     
     var body: some View {
@@ -53,6 +54,9 @@ struct RewardCoinRegister: View {
                         .font(AppFont.bodyBold)
                         .foregroundColor(.black)
                 }
+                .simultaneousGesture(TapGesture().onEnded {
+                    coinCount += 10
+                })
             }
         }
     }

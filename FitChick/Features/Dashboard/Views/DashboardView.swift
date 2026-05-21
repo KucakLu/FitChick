@@ -8,52 +8,77 @@
 import SwiftUI
 
 struct DashboardView: View {
+    private let petMessages = [
+        "Let’s walk with me!",
+        "Keep going!",
+        "You’re doing great!"
+    ]
+    private let stepGoal = 8000
+    private let healthStore = HealthStore()
+    
+    @AppStorage("coinCount") private var coinCount = 0
+    @State private var petMessageIndex = 0
+    @State private var stepCount = 0
+    
+    private var currentPetMessage: String {
+        petMessages[petMessageIndex]
+    }
+    
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             AppColor.dashboardBackground.edgesIgnoringSafeArea(.all)
+            Image("Spotlight")
+                .ignoresSafeArea()
+            
+            VStack {
+                DashboardHeaderView(coinCount: coinCount)
+                BubbleChatView(message: currentPetMessage)
+                
+                PetPreviewCard()
+                    .frame(width: 191, height: 100)
+                    .padding(.bottom, 24)
+                
+                DailyProgressSectionView(stepCount: stepCount, stepGoal: stepGoal)
+            }
+            
+            
+        }
+        .task {
+            fetchTodayStepCount()
+            await rotatePetMessages()
+        }
+    }
+    
+    private func fetchTodayStepCount() {
+        healthStore.fetchStepCount { steps, error in
+            if let error {
+                print(error.localizedDescription)
+                return
+            }
+            
+            stepCount = Int(steps)
+        }
+    }
+    
+    private func rotatePetMessages() async {
+        guard petMessages.count > 1 else {
+            return
+        }
         
-            dashboardHeader()
+        while !Task.isCancelled {
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
             
+            guard !Task.isCancelled else {
+                return
+            }
             
+            petMessageIndex = (petMessageIndex + 1) % petMessages.count
         }
     }
 }
 
-private func dashboardHeader() -> some View {
-    HStack {
-        HStack {
-            Image("RewardCoin")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 36)
-            
-            //Text("\(User.current.points)")
-            Text("897")
-                .font(AppFont.title1Bold)
-                .foregroundColor(AppColor.secondary500Dark)
-        }
-        Spacer()
-        HStack {
-            IconButton(icon: Image(systemName: "shippingbox.fill")) {
-                //some action to Gatcha page
-            }
-            IconButton(icon: Image(systemName: "jacket.fill")) {
-                //some action to Customization Pet Page
-            }
-        }
-    }
-    .padding(.horizontal, 24)
-    .padding(.vertical, 8)
-}
-
-private func bubbleChat() -> some View {
-    VStack{
-        
-    }
-}
 
 
 #Preview {
     DashboardView()
 }
-
