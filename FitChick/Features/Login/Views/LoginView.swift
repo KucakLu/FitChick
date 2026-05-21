@@ -10,6 +10,8 @@ import SwiftUI
 import AuthenticationServices
 
 struct LoginView: View {
+    @State private var navigateToConnectHealth = false
+    
     var body: some View {
         ZStack {
             AppColor.appBackground
@@ -33,7 +35,9 @@ struct LoginView: View {
                     },
                     onCompletion: { result in
                         switch result {
-                        case .success(let authorization): handleAppleSignIn(authorization: authorization)
+                        case .success(let authorization):
+                            handleAppleSignIn(authorization: authorization)
+                            navigateToConnectHealth = true
                         case .failure(let error):
                             print("Authorisation failed: \(error.localizedDescription)")
                         }
@@ -45,6 +49,9 @@ struct LoginView: View {
             }
             .padding(.bottom, 64)
             .ignoresSafeArea()
+        }
+        .navigationDestination(isPresented: $navigateToConnectHealth) {
+            ConnectHealth()
         }
     }
     
