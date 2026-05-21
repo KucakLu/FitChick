@@ -75,7 +75,7 @@ struct HatchView: View {
             }
         }
         .onReceive(timer) { _ in
-            withAnimation(.easeInOut(duration: 1)) {
+            withAnimation(.easeInOut(duration: 0.4)) {
                 if currentStage < eggStages.count - 1 {
                     currentStage += 1
                 } else {
