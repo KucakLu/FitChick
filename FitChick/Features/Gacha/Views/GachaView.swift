@@ -10,6 +10,7 @@ import SwiftUI
 import SwiftData
 
 struct GachaView: View {
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     
     @Query var users: [UserAccount]
@@ -25,9 +26,16 @@ struct GachaView: View {
             RewardAnimation()
             
             VStack(spacing: 0) {
-                HStack {
+                
+                HStack(alignment: .center, spacing: 12) {
                     Spacer()
-
+                    
+                    IconButton(icon: Image(systemName: "xmark")) {
+                        dismiss()
+                    }
+                    Spacer()
+                            .frame(width: 50)
+                    
                     HStack(spacing: 6) {
                         Image("RewardCoin")
                             .resizable()
@@ -42,9 +50,16 @@ struct GachaView: View {
                     .padding(.vertical, 6)
                     
                     Spacer()
+                            .frame(width: 50)
+                    // bentar belum nemu nama icon yang bener
+                    IconButton(icon: Image(systemName: "shippingbox.fill")) {
+                        // nanti ke page daftar item
+                    }
+                    
+                    Spacer()
                 }
                 .padding(.horizontal, 24)
-                .padding(.top, 50)
+                .padding(.top, 60)
                 
                 Spacer()
                 
@@ -86,6 +101,7 @@ struct GachaView: View {
                 
                 Spacer()
             }
+        
         }
     }
     private func executeGacha(cost: Int) {
