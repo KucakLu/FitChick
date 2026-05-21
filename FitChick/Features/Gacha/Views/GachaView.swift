@@ -132,7 +132,7 @@ struct GachaView: View {
 #Preview {
     let container = try! ModelContainer(for: UserAccount.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
     
-    let dummyUser = UserAccount(userId: "", petName: "", totalCoint: 50)
+    let dummyUser = UserAccount(userId: "", petName: "", totalCoint: 100)
     
     container.mainContext.insert(dummyUser)
     

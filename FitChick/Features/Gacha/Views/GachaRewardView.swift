@@ -57,10 +57,18 @@ struct GachaRewardView: View {
                 .aspectRatio(contentMode: .fit)
                 .transition(.opacity)
         case 3:
-            Image("ChestBox-4")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .transition(.opacity)
+            ZStack(alignment: .center) {
+                Image("ChestBox-4")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                // buat test pake reward coin dulu, nanti bakal ke item benerannya
+                Image("RewardCoin")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 90, height: 90)
+                    .offset(y: -40)
+            }
+            .transition(.opacity)
         default:
             EmptyView()
         }
