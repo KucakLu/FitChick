@@ -10,6 +10,7 @@ import SwiftUI
 struct ConnectHealth: View {
     
     @State private var stepCount: Double = 0
+    @State private var navigateToRewardCoinRegister = false
     
     let healthStore = HealthStore()
     
@@ -39,9 +40,14 @@ struct ConnectHealth: View {
                     .padding(.bottom, 20)
                 PrimaryButton(title: "Allow Access") {
                     requestHealthKitAccess()
+                    navigateToRewardCoinRegister = true
                 }
             }
             .padding(.horizontal, 30)
+        }
+        .navigationDestination(isPresented: $navigateToRewardCoinRegister) {
+            RewardCoinRegister()
+                .toolbar(.hidden, for: .navigationBar)
         }
     }
     
