@@ -62,7 +62,7 @@ private struct DismissButtonStyle: ButtonStyle {
     private var backgroundColor: Color {
         switch variant {
         case .neutral:
-            return AppColor.neutral100
+            return .white
         case .secondary:
             return AppColor.secondary100
         }
