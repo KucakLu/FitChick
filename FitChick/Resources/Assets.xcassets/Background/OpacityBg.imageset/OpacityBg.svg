@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="441px" height="581px" viewBox="0 0 441 581" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group 10</title>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#FFFEF5" offset="0%"></stop>
+            <stop stop-color="#FFE582" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="73.3899388%" y1="90.8695823%" x2="26.2773664%" y2="8.78651685%" id="linearGradient-2">
+            <stop stop-color="#FFFFFF" stop-opacity="0.4" offset="0%"></stop>
+            <stop stop-color="#FFFFFF" stop-opacity="0.6" offset="100%"></stop>
+        </linearGradient>
+        <ellipse id="path-3" cx="123.364598" cy="162.527962" rx="123.364598" ry="162.527962"></ellipse>
+    </defs>
+    <g id="Design" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Background" transform="translate(20, -147)">
+            <g id="Group-10" transform="translate(-20, 147)">
+                <g id="Group-4" transform="translate(97.1354, 127.972)">
+                    <mask id="mask-4" fill="white">
+                        <use xlink:href="#path-3"></use>
+                    </mask>
+                    <use id="Oval-6" fill-opacity="0.1" fill="url(#linearGradient-2)" xlink:href="#path-3"></use>
+                </g>
+                <path d="M220.5,0 C342.278787,0 441,130.06128 441,290.5 C441,450.93872 342.278787,581 220.5,581 C98.7212127,581 0,450.93872 0,290.5 C0,130.06128 98.7212127,0 220.5,0 Z M220.5,41.9120201 C116.290903,41.9120201 31.8127381,153.20865 31.8127381,290.5 C31.8127381,427.79135 116.290903,539.08798 220.5,539.08798 C324.709097,539.08798 409.187262,427.79135 409.187262,290.5 C409.187262,153.20865 324.709097,41.9120201 220.5,41.9120201 Z" id="Combined-Shape" fill-opacity="0.2" fill="#FFFFFF"></path>
+                <path d="M220.5,42.2062662 C324.585748,42.2062662 408.963918,153.371157 408.963918,290.5 C408.963918,427.628843 324.585748,538.793734 220.5,538.793734 C116.414252,538.793734 32.0360816,427.628843 32.0360816,290.5 C32.0360816,153.371157 116.414252,42.2062662 220.5,42.2062662 Z M220.5,85.5829304 C134.597927,85.5829304 64.9605375,177.327427 64.9605375,290.5 C64.9605375,403.672573 134.597927,495.41707 220.5,495.41707 C306.402073,495.41707 376.039462,403.672573 376.039462,290.5 C376.039462,177.327427 306.402073,85.5829304 220.5,85.5829304 Z" id="Combined-Shape" fill-opacity="0.4" fill="#FFFFFF"></path>
+                <ellipse id="Combined-Shape" fill-opacity="0.6" fill="#FFFFFF" cx="220.5" cy="290.5" rx="155.477559" ry="204.835515"></ellipse>
+            </g>
+        </g>
+    </g>
+</svg>
