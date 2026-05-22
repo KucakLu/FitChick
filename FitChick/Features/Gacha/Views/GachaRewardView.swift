@@ -11,6 +11,7 @@ struct GachaRewardView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var currentStep: Int = 0
     let drawType: Int
+    @State private var isRotating: Bool = true
     
     private var showReward: Bool { currentStep == 4 }
     
@@ -80,7 +81,13 @@ struct GachaRewardView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 90, height: 90)
+                    .rotationEffect(isRotating ? Angle(degrees: 10) : Angle(degrees: -10))
                     .offset(y: -40)
+                    .onAppear {
+                        withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                            isRotating.toggle()
+                        }
+                    }
             }
             .transition(.opacity)
         case 4:
