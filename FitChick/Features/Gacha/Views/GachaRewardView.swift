@@ -9,7 +9,7 @@ import SwiftUI
 
 struct GachaRewardView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var currentStep: Int = 0
+    @State private var currentStep: Int = 1
     let drawType: Int
     
     private var showReward: Bool { currentStep == 4 }
