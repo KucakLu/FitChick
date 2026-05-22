@@ -22,6 +22,7 @@ struct RewardCoinRegister: View {
                 endPoint: .bottom
             )
             .ignoresSafeArea()
+            
             Image("RewardBg")
                 .ignoresSafeArea()
                 .scaleEffect(1.1)
