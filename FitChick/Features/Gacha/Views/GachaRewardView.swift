@@ -12,6 +12,8 @@ struct GachaRewardView: View {
     @State private var currentStep: Int = 0
     let drawType: Int
     
+    private var showReward: Bool { currentStep == 4 }
+    
     var body: some View {
         ZStack {
             RewardAnimation()
@@ -40,6 +42,19 @@ struct GachaRewardView: View {
             }
             .ignoresSafeArea(.all, edges: .bottom)
         }
+        .overlay(
+            Group {
+                if currentStep == 4 {
+                    RewardItem()
+                        .transition(.asymmetric(
+                            insertion: .scale(scale: 0.8).combined(with: .opacity),
+                            removal: .opacity
+                        ))
+                        .zIndex(1)
+                }
+            }
+        )
+        .animation(.spring(response: 0.45, dampingFraction: 0.85), value: currentStep)
     }
     
     @ViewBuilder
@@ -61,13 +76,16 @@ struct GachaRewardView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                 // buat test pake reward coin dulu, nanti bakal ke item benerannya
-                Image("RewardCoin")
+                Image("RedRibbon")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 90, height: 90)
                     .offset(y: -40)
             }
             .transition(.opacity)
+        case 4:
+            // RewardItem is presented via overlay when currentStep == 4
+            EmptyView()
         default:
             EmptyView()
         }
@@ -86,6 +104,8 @@ struct GachaRewardView: View {
         withAnimation(.spring(response: 0.35, dampingFraction: 0.6, blendDuration: 0)) {
             if currentStep < 3 {
                 currentStep += 1
+            } else if currentStep == 3 {
+                currentStep = 4 // trigger RewardItem presentation
             } else {
                 dismiss()
             }
