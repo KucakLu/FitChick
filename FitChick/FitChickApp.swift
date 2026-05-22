@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct FitChickApp: App {
     var body: some Scene {
         WindowGroup {
-            Onboarding()
+//            Onboarding()
+              HatchPage4s()
         }
+        .modelContainer(for: UserAccount.self)
     }
 }

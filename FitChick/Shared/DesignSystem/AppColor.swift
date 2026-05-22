@@ -46,6 +46,7 @@ enum AppColor {
 
     // MARK: - Secondary
     static let secondary0Surface = Color("Secondary0Surface")
+    static let secondary50Surface = Color("Secondary50Surface")
     static let secondary100 = Color("Secondary100")
     static let secondary200Secondary = Color("Secondary200Secondary")
     static let secondary300Main = Color("Secondary300Main")
@@ -64,8 +65,18 @@ enum AppColor {
     static let success500Dark = Color("Success500Dark")
     static let success50Surface = Color("Success50Surface")
     static let success75 = Color("Success75")
+
+    // MARK: - Violet
+    static let violet100 = Color("Violet100")
+    static let violet200Secondary = Color("Violet200Secondary")
+    static let violet300Main = Color("Violet300Main")
+    static let violet400Border = Color("Violet400Border")
+    static let violet500Dark = Color("Violet500Dark")
+    static let violet50Surface = Color("Violet50Surface")
+    static let violet75 = Color("Violet75")
     
     // MARK: - Other Variable
     static let appBackground = secondary0Surface
+    static let dashboardBackground = secondary100
 
 }

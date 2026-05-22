@@ -6,14 +6,9 @@
 //
 
 import SwiftUI
-internal import Combine
 
 struct HatchView: View {
-    @State private var currentStage = 0
     @State private var isRotating: Bool = false
-    
-    let eggStages = ["EggStage1", "EggStage2", "EggStage3", "EggStage4"]
-    let timer = Timer.publish(every: 2.0, on: .main, in: .common).autoconnect()
     
     var body: some View {
         ZStack {
@@ -28,8 +23,7 @@ struct HatchView: View {
             .ignoresSafeArea()
             
             Image("RewardBg")
-                .ignoresSafeArea()
-                .scaleEffect(1.1)
+                .scaleEffect(1.3)
                 .rotationEffect(.degrees(isRotating ? 360 : 0))
                 .animation(
                     .linear(duration: 3)
@@ -39,8 +33,9 @@ struct HatchView: View {
                 .onAppear {
                     isRotating = true
                 }
+                .ignoresSafeArea()
             
-            VStack(spacing: 0) {
+            VStack{
                 VStack(spacing: 12) {
                     Text("Hatch Me!")
                         .font(AppFont.largeTitleBold)
@@ -51,36 +46,15 @@ struct HatchView: View {
                         .foregroundColor(AppColor.secondary500Dark)
                 }
                 .padding(.top, 80)
+                .padding(.bottom, 180)
+                
+//                Spacer()
+                
+                HatchAnimationView()
+                    .frame(width: 360, height: 203)
+//                    .offset(y: 10)
                 
                 Spacer()
-                
-                ZStack(alignment: .bottom) {
-                    Image("Nest")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 300, height: 153)
-                        .offset(y: 23)
-                    
-                    Image(eggStages[currentStage])
-                        .resizable()
-                        .scaledToFill()
-                        .offset(y: -20)
-                        .frame(width: 345, height: 340)
-                        .zIndex(1)
-                        .id(currentStage)
-                        .transition(.opacity)
-                }
-                
-                Spacer()
-            }
-        }
-        .onReceive(timer) { _ in
-            withAnimation(.easeInOut(duration: 0.4)) {
-                if currentStage < eggStages.count - 1 {
-                    currentStage += 1
-                } else {
-                    // muncul pet nya deh
-                }
             }
         }
     }
