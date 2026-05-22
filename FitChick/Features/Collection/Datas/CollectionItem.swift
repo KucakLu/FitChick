@@ -26,7 +26,7 @@ struct CollectionData {
             name: "round glasses",
             rarity: .reguler,
             svgAssetName: "round_glasses",
-            isOwned: true
+            isOwned: false
         ),
         CollectionItem(
             name: "black hat",

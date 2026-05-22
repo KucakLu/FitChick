@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CollectionView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var items: [CollectionItem] = CollectionData.items
+    @State private var items: [CollectionItem] = CollectionData.items.sorted { $0.isOwned && !$1.isOwned }
     @State private var navigateToDashboard = false
     
     private let columns = [
