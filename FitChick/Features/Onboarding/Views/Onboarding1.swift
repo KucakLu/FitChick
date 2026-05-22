@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct Onboarding1: View {
-    @State private var isShowingOnboarding2 = false
+    @State private var navigationPath: [OnboardingRoute] = []
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             ZStack {
                 AppColor.appBackground
                     .ignoresSafeArea()
@@ -32,15 +32,23 @@ struct Onboarding1: View {
                     .font(AppFont.body)
                     .foregroundColor(.neutral600Subtext)
                     PrimaryButton(title: "Next") {
-                        isShowingOnboarding2 = true
+                        navigationPath.append(.onboarding2)
                     }
                 }
                 .padding(.bottom, 64)
                 .ignoresSafeArea()
             }
-            .navigationDestination(isPresented: $isShowingOnboarding2) {
-                Onboarding2()
+            .navigationDestination(for: OnboardingRoute.self) { route in
+                switch route {
+                case .onboarding2:
+                    Onboarding2 {
+                        navigationPath.append(.onboarding3)
+                    }
                     .toolbar(.hidden, for: .navigationBar)
+                case .onboarding3:
+                    Onboarding3()
+                    .toolbar(.hidden, for: .navigationBar)
+                }
             }
             .toolbar(.hidden, for: .navigationBar)
         }
@@ -49,4 +57,9 @@ struct Onboarding1: View {
 
 #Preview {
     Onboarding1()
+}
+
+private enum OnboardingRoute: Hashable {
+    case onboarding2
+    case onboarding3
 }

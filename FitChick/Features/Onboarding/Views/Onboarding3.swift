@@ -8,9 +8,38 @@
 import SwiftUI
 
 struct Onboarding3: View {
-    @State private var isShowingLogin = false
+    @State private var showLoginSheet = false
+    @State private var shouldNavigateToConnectHealth = false
+    @State private var isShowingConnectHealth = false
     
     var body: some View {
+        Group {
+            if isShowingConnectHealth {
+                ConnectHealthView()
+                    .toolbar(.hidden, for: .navigationBar)
+            } else {
+                onboardingContent
+            }
+        }
+        .sheet(isPresented: $showLoginSheet, onDismiss: {
+            navigateToConnectHealthIfNeeded()
+        }) {
+            LoginSheetView {
+                shouldNavigateToConnectHealth = true
+
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 300_000_000)
+                    navigateToConnectHealthIfNeeded()
+                }
+            }
+            .presentationDetents([.height(290), .medium])
+            .presentationDragIndicator(.visible)
+            .interactiveDismissDisabled()
+        }
+        .toolbar(.hidden, for: .navigationBar)
+    }
+
+    private var onboardingContent: some View {
         ZStack {
             AppColor.appBackground
                 .ignoresSafeArea()
@@ -31,17 +60,19 @@ struct Onboarding3: View {
                 .font(AppFont.body)
                 .foregroundColor(.neutral600Subtext)
                 PrimaryButton(title: "Next") {
-                    isShowingLogin = true
+                    showLoginSheet = true
                 }
             }
             .padding(.bottom, 64)
             .ignoresSafeArea()
         }
-        .navigationDestination(isPresented: $isShowingLogin) {
-            LoginView()
-                .toolbar(.hidden, for: .navigationBar)
-        }
-        .toolbar(.hidden, for: .navigationBar)
+    }
+
+    private func navigateToConnectHealthIfNeeded() {
+        guard shouldNavigateToConnectHealth else { return }
+
+        shouldNavigateToConnectHealth = false
+        isShowingConnectHealth = true
     }
 }
 

@@ -44,19 +44,17 @@ struct DashboardView: View {
             
         }
         .task {
-            fetchTodayStepCount()
+            await fetchTodayStepCount()
             await rotatePetMessages()
         }
     }
     
-    private func fetchTodayStepCount() {
-        healthStore.fetchStepCount { steps, error in
-            if let error {
-                print(error.localizedDescription)
-                return
-            }
-            
+    private func fetchTodayStepCount() async {
+        do {
+            let steps = try await healthStore.fetchStepCount()
             stepCount = Int(steps)
+        } catch {
+            print(error.localizedDescription)
         }
     }
     

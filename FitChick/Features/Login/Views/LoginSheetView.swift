@@ -8,47 +8,49 @@ import SwiftData
 import AuthenticationServices
 
 struct LoginSheetView: View {
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @Binding var navigateToConnectHealth: Bool
+    let onLoginSuccess: () -> Void
     
     var body: some View {
-            VStack(spacing: 0) {
-                Text("Login")
-                    .font(AppFont.title1Bold)
-                    .multilineTextAlignment(.center)
-                    .padding(.top, 32)
-                
-                Text("Continue with Apple and meet your\nfavorite chick!")
-                    .font(AppFont.body)
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.neutral600Subtext)
-                    .padding(.top, 24)
-                    .padding(.bottom, 32)
-                
-                SignInWithAppleButton(
-                    onRequest: { request in
-                        request.requestedScopes = [.fullName, .email]
-                    },
-                    onCompletion: { result in
-                        switch result {
-                        case .success(let authorization):
+        VStack(spacing: 0) {
+            Text("Login")
+                .font(AppFont.title1Bold)
+                .multilineTextAlignment(.center)
+                .padding(.top, 32)
+            
+            Text("Continue with Apple and meet your\nfavorite chick!")
+                .font(AppFont.body)
+                .multilineTextAlignment(.center)
+                .foregroundColor(.neutral600Subtext)
+                .padding(.top, 24)
+                .padding(.bottom, 32)
+            
+            SignInWithAppleButton(
+                onRequest: { request in
+                    request.requestedScopes = [.fullName, .email]
+                },
+                onCompletion: { result in
+                    switch result {
+                    case .success(let authorization):
+                        Task { @MainActor in
                             handleAppleSignIn(authorization: authorization)
-                            navigateToConnectHealth = true
-                        case .failure(let error):
-                            print("Authorisation failed: \(error.localizedDescription)")
+                            onLoginSuccess()
+                            dismiss()
                         }
+                    case .failure(let error):
+                        print("Authorisation failed: \(error.localizedDescription)")
                     }
-                )
-                .signInWithAppleButtonStyle(.black)
-                .frame(height: 46)
-                .clipShape(Capsule())
-                .padding(.horizontal, 24)
-                
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity) 
-            .background(Color(uiColor: .systemBackground))
+                }
+            )
+            .signInWithAppleButtonStyle(.black)
+            .frame(height: 46)
+            .clipShape(Capsule())
+            .padding(.horizontal, 24)
         }
-
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(uiColor: .systemBackground))
+    }
     
     private func handleAppleSignIn(authorization: ASAuthorization) {
         if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
