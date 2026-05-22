@@ -15,7 +15,7 @@ class UserAccount {
     var petName: String
     var totalCoint: Int
     
-    init(userId: String, petName: String = "Chick", totalCoint: Int = 0) {
+    init(userId: String, petName: String = "", totalCoint: Int = 0) {
         self.userId = userId
         self.petName = petName
         self.totalCoint = totalCoint

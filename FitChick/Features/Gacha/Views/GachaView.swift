@@ -54,7 +54,7 @@ struct GachaView: View {
                     Spacer()
                             .frame(width: 50)
                     // bentar belum nemu nama icon yang bener
-                    IconButton(icon: Image(systemName: "shippingbox.fill")) {
+                    IconButton(icon: Image("collectibleIcon")) {
                         // nanti ke page daftar item
                     }
                     

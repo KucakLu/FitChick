@@ -104,14 +104,14 @@ private struct ClaimButtonStyle: ButtonStyle {
     }
     
     private var backgroundColor: Color {
-        if isDisabled {
+        guard !isDisabled else {
             return AppColor.neutral200
-        } else if isSelected {
-            return AppColor.primary400Border
-        } else {
-            return AppColor.primary300Main
         }
+        return isSelected
+            ? AppColor.primary400Border
+            : AppColor.primary300Main
     }
+    
 }
 
 internal enum ClaimButtonSize {
