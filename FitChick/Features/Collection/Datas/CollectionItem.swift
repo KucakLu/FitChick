@@ -32,25 +32,25 @@ struct CollectionData {
             name: "black hat",
             rarity: .reguler,
             svgAssetName: "black_hat",
-            isOwned: false
+            isOwned: true
         ),
         CollectionItem(
             name: "headband",
             rarity: .reguler,
             svgAssetName: "headband",
-            isOwned: false
+            isOwned: true
         ),
         CollectionItem(
             name: "headband",
             rarity: .reguler,
             svgAssetName: "headband",
-            isOwned: false
+            isOwned: true
         ),
         CollectionItem(
             name: "headband",
             rarity: .reguler,
             svgAssetName: "headband",
-            isOwned: false
+            isOwned: true
         ),
         CollectionItem(
             name: "headband",
