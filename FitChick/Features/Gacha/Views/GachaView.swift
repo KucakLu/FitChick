@@ -17,6 +17,7 @@ struct GachaView: View {
     
     @State private var showRewardView: Bool = false
     @State private var selectedDrawType: Int = 1
+    @State private var navigateToCollectionPage = false
     
     var body: some View {
         let userTotalCoint = users.first?.totalCoint ?? 50
@@ -53,9 +54,9 @@ struct GachaView: View {
                     
                     Spacer()
                             .frame(width: 50)
-                    // bentar belum nemu nama icon yang bener
+
                     IconButton(icon: Image("collectibleIcon")) {
-                        // nanti ke page daftar item
+                        navigateToCollectionPage = true
                     }
                     
                     Spacer()
@@ -107,6 +108,10 @@ struct GachaView: View {
             }
             .fullScreenCover(isPresented: $showRewardView) {
                         GachaRewardView(drawType: selectedDrawType)
+            }
+            .navigationBarHidden(true)
+            .navigationDestination(isPresented: $navigateToCollectionPage) {
+                CollectionView()
             }
         
         }
