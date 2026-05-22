@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LoginView: View {
     @State private var showLoginSheet = false
+    @State private var shouldNavigateToConnectHealth = false
     @State private var navigateToConnectHealth = false
     
     var body: some View {
@@ -32,14 +33,21 @@ struct LoginView: View {
                 showLoginSheet = true
             }
             .navigationDestination(isPresented: $navigateToConnectHealth) {
-                ConnectHealth()
+                ConnectHealthView()
             }
         }
-        .sheet(isPresented: $showLoginSheet) {
-            LoginSheetView(navigateToConnectHealth: $navigateToConnectHealth)
-                .presentationDetents([.height(290), .medium])
-                .presentationDragIndicator(.visible)
-                .interactiveDismissDisabled()
+        .sheet(isPresented: $showLoginSheet, onDismiss: {
+            guard shouldNavigateToConnectHealth else { return }
+
+            shouldNavigateToConnectHealth = false
+            navigateToConnectHealth = true
+        }) {
+            LoginSheetView {
+                shouldNavigateToConnectHealth = true
+            }
+            .presentationDetents([.height(290), .medium])
+            .presentationDragIndicator(.visible)
+            .interactiveDismissDisabled()
         }
     }
 }

@@ -10,6 +10,7 @@ import SwiftUI
 struct RewardCoinRegister: View {
     @AppStorage("coinCount") private var coinCount = 0
     @State private var isRotating: Bool = false
+    @State private var navigateToHatchView: Bool = false
     
     var body: some View {
         ZStack {
@@ -22,6 +23,7 @@ struct RewardCoinRegister: View {
                 endPoint: .bottom
             )
             .ignoresSafeArea()
+            
             Image("RewardBg")
                 .ignoresSafeArea()
                 .scaleEffect(1.1)
@@ -49,15 +51,19 @@ struct RewardCoinRegister: View {
                     }
                 }
                 .padding(.bottom, 120)
-                NavigationLink(destination: HatchView()) {
+                Button {
+                    coinCount += 10
+                    navigateToHatchView = true
+                } label: {
                     Text("Tap to collect the coin")
                         .font(AppFont.bodyBold)
                         .foregroundColor(.black)
                 }
-                .simultaneousGesture(TapGesture().onEnded {
-                    coinCount += 10
-                })
             }
+        }
+        .navigationDestination(isPresented: $navigateToHatchView) {
+            HatchView()
+                .toolbar(.hidden, for: .navigationBar)
         }
     }
 }

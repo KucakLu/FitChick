@@ -8,7 +8,11 @@
 import SwiftUI
 
 struct Onboarding2: View {
-    @State private var isShowingOnboarding3 = false
+    let onNext: () -> Void
+
+    init(onNext: @escaping () -> Void = {}) {
+        self.onNext = onNext
+    }
 
     var body: some View {
         ZStack {
@@ -31,15 +35,11 @@ struct Onboarding2: View {
                 .font(AppFont.body)
                 .foregroundColor(.neutral600Subtext)
                 PrimaryButton(title: "Next") {
-                    isShowingOnboarding3 = true
+                    onNext()
                 }
             }
             .padding(.bottom, 64)
             .ignoresSafeArea()
-        }
-        .navigationDestination(isPresented: $isShowingOnboarding3) {
-            Onboarding3()
-                .toolbar(.hidden, for: .navigationBar)
         }
         .toolbar(.hidden, for: .navigationBar)
     }

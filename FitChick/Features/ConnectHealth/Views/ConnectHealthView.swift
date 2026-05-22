@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ConnectHealth: View {
+struct ConnectHealthView: View {
     
     @State private var stepCount: Double = 0
     @State private var navigateToRewardCoinRegister = false
@@ -39,8 +39,9 @@ struct ConnectHealth: View {
                     .font(AppFont.body)
                     .padding(.bottom, 20)
                 PrimaryButton(title: "Allow Access") {
-                    requestHealthKitAccess()
-                    navigateToRewardCoinRegister = true
+                    Task {
+                        await requestHealthKitAccess()
+                    }
                 }
             }
             .padding(.horizontal, 30)
@@ -51,23 +52,25 @@ struct ConnectHealth: View {
         }
     }
     
-    func requestHealthKitAccess() {
-        healthStore.requestAuthorization { success, error in
-            if success {
-                healthStore.fetchStepCount { steps, error in
-                    if let error = error {
-                        print(error.localizedDescription)
-                    } else {
-                        stepCount = steps
-                    }
-                }
-            } else if let error = error {
+    @MainActor
+    func requestHealthKitAccess() async {
+        do {
+            try await healthStore.requestAuthorization()
+            
+            do {
+                stepCount = try await healthStore.fetchStepCount()
+            } catch {
+                stepCount = 0
                 print(error.localizedDescription)
             }
+            
+            navigateToRewardCoinRegister = true
+        } catch {
+            print(error.localizedDescription)
         }
     }
 }
 
 #Preview {
-    ConnectHealth()
+    ConnectHealthView()
 }

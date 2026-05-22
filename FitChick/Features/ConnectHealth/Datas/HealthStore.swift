@@ -9,35 +9,59 @@ import HealthKit
 
 class HealthStore {
     let healthStore = HKHealthStore()
-    
-    // request permissions
-    func requestAuthorization(completion: @escaping(Bool, Error?)-> Void){
-        let StepCountType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
-        let StepDistanceType = HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning)!
-        
-        let typesToRead: Set = [StepCountType, StepDistanceType]
-        
-        healthStore.requestAuthorization(toShare: [], read: typesToRead) { (success, error) in
-            completion(success, error)
-        }
-        
+
+    enum HealthStoreError: Error {
+        case healthDataUnavailable
+        case missingStepCountType
+        case missingWalkingRunningDistanceType
     }
-    
+
+    // request permissions
+    func requestAuthorization() async throws {
+        guard HKHealthStore.isHealthDataAvailable() else {
+            throw HealthStoreError.healthDataUnavailable
+        }
+
+        guard let stepCountType = HKQuantityType.quantityType(forIdentifier: .stepCount) else {
+            throw HealthStoreError.missingStepCountType
+        }
+
+        guard let stepDistanceType = HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning) else {
+            throw HealthStoreError.missingWalkingRunningDistanceType
+        }
+
+        let typesToRead: Set = [stepCountType, stepDistanceType]
+
+        try await healthStore.requestAuthorization(toShare: [], read: typesToRead)
+    }
+
     // Fetch Step count data from healthkit
-    func fetchStepCount(completion: @escaping(Double, Error?)-> Void){
-        let StepCountType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
-        
+    func fetchStepCount() async throws -> Double {
+        guard let stepCountType = HKQuantityType.quantityType(forIdentifier: .stepCount) else {
+            throw HealthStoreError.missingStepCountType
+        }
+
         let startOfDay = Calendar.current.startOfDay(for: Date()) // todays date
         let predicate = HKQuery.predicateForSamples(withStart: startOfDay, end: Date(), options: .strictStartDate)
-        
-        let query = HKStatisticsQuery(quantityType: StepCountType, quantitySamplePredicate: predicate, options: .cumulativeSum) {
-            _, result, _ in
-            let stepCount = result?.sumQuantity()?.doubleValue(for: .count()) ?? 0
-            DispatchQueue.main.async {
-                completion(stepCount, nil)
+
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKStatisticsQuery(quantityType: stepCountType, quantitySamplePredicate: predicate, options: .cumulativeSum) {
+                _, result, error in
+                if let error = error as? HKError, error.code == .errorNoData {
+                    continuation.resume(returning: 0)
+                    return
+                }
+                
+                if let error = error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                let stepCount = result?.sumQuantity()?.doubleValue(for: .count()) ?? 0
+                continuation.resume(returning: stepCount)
             }
+
+            healthStore.execute(query)
         }
-        
-        healthStore.execute(query)
     }
 }
