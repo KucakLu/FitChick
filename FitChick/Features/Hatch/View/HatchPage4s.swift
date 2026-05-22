@@ -10,12 +10,33 @@ import SwiftUI
 struct HatchPage4s: View {
     @State private var isChickVisible = false
     @State private var isChickIdleAnimating = false
-
+    @State private var isRotating: Bool = false
+    
     var body: some View {
         ZStack {
-            AppColor.appBackground
+            LinearGradient(
+                colors: [
+                    AppColor.secondary0Surface,
+                    AppColor.secondary300Main
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+            
             Image("RewardBg")
-            Image("OpacityBg")
+                .ignoresSafeArea()
+                .scaleEffect(1.1)
+                .rotationEffect(.degrees(isRotating ? 360 : 0))
+                .animation(
+                    .linear(duration: 3)
+                    .repeatForever(autoreverses: false),
+                    value: isRotating
+                )
+                .onAppear {
+                    isRotating = true
+                }
+            
             
             VStack() {
                 Text("Congratulation")
@@ -35,7 +56,7 @@ struct HatchPage4s: View {
                         withAnimation(.easeOut(duration: 0.45)) {
                             isChickVisible = true
                         }
-
+                        
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
                             withAnimation(.easeInOut(duration: 1).repeatForever(autoreverses: true)) {
                                 isChickIdleAnimating = true
