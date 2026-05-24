@@ -35,7 +35,7 @@ struct Onboarding1: View {
                         PrimaryButton(title: "Next") {
                             navigationPath.append(.onboarding2)
                         }
-                        SkipButton(title: "Skip") {
+                        SecondaryButton(title: "Skip") {
                             navigationPath.append(.skipOnboarding)
                         }
                     }

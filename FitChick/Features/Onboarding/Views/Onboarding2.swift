@@ -43,7 +43,7 @@ struct Onboarding2: View {
                     PrimaryButton(title: "Next") {
                         onNext()
                     }
-                    SkipButton(title: "Skip") {
+                    SecondaryButton(title: "Skip") {
                         onSkip()
                     }
                 }

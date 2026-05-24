@@ -1,5 +1,5 @@
 //
-//  SkipButton.swift
+//  SecondaryButton.swift
 //  FitChick
 //
 //  Created by Vinka Alrezky As on 24/05/26.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SkipButton: View {
+struct SecondaryButton: View {
     let title: String
     let isDisabled: Bool
     let action: () -> Void
@@ -32,10 +32,10 @@ struct SkipButton: View {
                 .font(AppFont.bodyBold)
                 .kerning(AppFont.bodyBold.letterSpacing)
                 .foregroundStyle(textColor)
-                .frame(width: SkipButtonSize.contentWidth)
-                .frame(height: SkipButtonSize.contentHeight)
+                .frame(width: SecondaryButtonSize.contentWidth)
+                .frame(height: SecondaryButtonSize.contentHeight)
         }
-        .buttonStyle(SkipButtonStyle(isDisabled: isDisabled))
+        .buttonStyle(SecondaryButtonStyle(isDisabled: isDisabled))
         .disabled(isDisabled)
     }
 
@@ -46,7 +46,7 @@ struct SkipButton: View {
     }
 }
 
-private struct SkipButtonStyle: ButtonStyle {
+private struct SecondaryButtonStyle: ButtonStyle {
     let isDisabled: Bool
 
     func makeBody(configuration: Configuration) -> some View {
@@ -56,7 +56,7 @@ private struct SkipButtonStyle: ButtonStyle {
             configuration.label
                 .background {
                     RoundedRectangle(
-                        cornerRadius: SkipButtonSize.cornerRadius
+                        cornerRadius: SecondaryButtonSize.cornerRadius
                     )
                     .fill(backgroundColor)
                 }
@@ -67,11 +67,11 @@ private struct SkipButtonStyle: ButtonStyle {
                 }
                 .offset(
                     y: configuration.isPressed
-                    ? SkipButtonSize.pressedOffset
+                    ? SecondaryButtonSize.pressedOffset
                     : 0
                 )
         }
-        .frame(height: SkipButtonSize.totalHeight)
+        .frame(height: SecondaryButtonSize.totalHeight)
         .animation(
             .easeInOut(duration: 0.08),
             value: configuration.isPressed
@@ -92,15 +92,15 @@ private struct SkipButtonStyle: ButtonStyle {
 
     private func bottomLayer(isPressed: Bool) -> some View {
         RoundedRectangle(
-            cornerRadius: SkipButtonSize.cornerRadius
+            cornerRadius: SecondaryButtonSize.cornerRadius
         )
         .fill(shadowColor)
-        .frame(width: SkipButtonSize.contentWidth)
-        .frame(height: SkipButtonSize.contentHeight)
+        .frame(width: SecondaryButtonSize.contentWidth)
+        .frame(height: SecondaryButtonSize.contentHeight)
         .offset(
             y: isPressed
-            ? SkipButtonSize.pressedShadowOffset
-            : SkipButtonSize.defaultShadowOffset
+            ? SecondaryButtonSize.pressedShadowOffset
+            : SecondaryButtonSize.defaultShadowOffset
         )
     }
 
@@ -113,7 +113,7 @@ private struct SkipButtonStyle: ButtonStyle {
     }
 }
 
-private enum SkipButtonSize {
+private enum SecondaryButtonSize {
     static let contentWidth: CGFloat = 320
     static let contentHeight: CGFloat = 46
     static let totalHeight: CGFloat = 54
@@ -128,11 +128,11 @@ private enum SkipButtonSize {
 
 #Preview {
     VStack(spacing: 24) {
-        SkipButton(title: "Skip") {
+        SecondaryButton(title: "Skip") {
             print("Skip tapped")
         }
 
-        SkipButton(title: "Disabled", isDisabled: true) {
+        SecondaryButton(title: "Disabled", isDisabled: true) {
             print("Disabled")
         }
     }

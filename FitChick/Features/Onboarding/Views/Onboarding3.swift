@@ -69,7 +69,7 @@ struct Onboarding3: View {
                     PrimaryButton(title: "Next") {
                         showLoginSheet = true
                     }
-                    SkipButton(title: "Skip") {
+                    SecondaryButton(title: "Skip") {
                         onSkip()
                     }
                 }
