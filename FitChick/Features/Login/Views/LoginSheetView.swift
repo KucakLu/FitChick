@@ -2,14 +2,13 @@
 //  LoginSheetView.swift
 //  FitChick
 //
+//
 
 import SwiftUI
-import SwiftData
 import AuthenticationServices
 
 struct LoginSheetView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var modelContext
     let onLoginSuccess: () -> Void
     
     var body: some View {
@@ -35,6 +34,7 @@ struct LoginSheetView: View {
                     case .success(let authorization):
                         Task { @MainActor in
                             handleAppleSignIn(authorization: authorization)
+                            UserDefaults.standard.set(true, forKey: "isLoggedIn")
                             onLoginSuccess()
                             dismiss()
                         }
@@ -63,7 +63,6 @@ struct LoginSheetView: View {
             if !email.isEmpty { KeychainManager.shared.save(key: "appleUserEmail", value: email) }
             
             getUserData()
-            saveUserToSwiftData(userId: userId)
         }
     }
     
@@ -76,22 +75,5 @@ struct LoginSheetView: View {
         print("User ID: \(userId ?? "Unknown")")
         print("Full Name: \(fullName ?? "Unknown")")
         print("Email: \(email ?? "Unknown")")
-    }
-    
-    private func saveUserToSwiftData(userId: String) {
-        let descriptor = FetchDescriptor<UserAccount>(predicate: #Predicate { $0.userId == userId })
-        do {
-            let existingUsers = try modelContext.fetch(descriptor)
-            if existingUsers.isEmpty {
-                let newUser = UserAccount(userId: userId, petName: "", totalCoint: 0)
-                modelContext.insert(newUser)
-                try modelContext.save()
-                print("New SwiftData account created for ID: \(userId)")
-            } else {
-                print("Existing user detected, no new data needed.")
-            }
-        } catch {
-            print("Failed to process SwiftData: \(error.localizedDescription)")
-        }
     }
 }
