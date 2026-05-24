@@ -64,7 +64,7 @@ struct Onboarding1: View {
                     )
                     .toolbar(.hidden, for: .navigationBar)
                 case .skipOnboarding:
-                    SkipView()
+                    SkipOnboardingView()
                         .toolbar(.hidden, for: .navigationBar)
                 }
             }

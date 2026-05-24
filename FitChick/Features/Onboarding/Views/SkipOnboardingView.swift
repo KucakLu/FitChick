@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SkipView: View {
+struct SkipOnboardingView: View {
     @State private var showLoginSheet = false
     @State private var shouldNavigateToConnectHealth = false
     @State private var navigateToConnectHealth = false
@@ -120,5 +120,5 @@ struct SkipView: View {
 }
 
 #Preview {
-    SkipView()
+    SkipOnboardingView()
 }
