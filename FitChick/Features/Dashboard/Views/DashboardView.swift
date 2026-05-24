@@ -19,29 +19,52 @@ struct DashboardView: View {
     @AppStorage("coinCount") private var coinCount = 0
     @State private var petMessageIndex = 0
     @State private var stepCount = 0
+    @State private var navigateToGachaPage = false
+    @State private var navigateToDressUpPage = false
     
     private var currentPetMessage: String {
         petMessages[petMessageIndex]
     }
     
     var body: some View {
-        ZStack(alignment: .top) {
-            AppColor.dashboardBackground.edgesIgnoringSafeArea(.all)
-            Image("Spotlight")
-                .ignoresSafeArea()
-            
-            VStack {
-                DashboardHeaderView(coinCount: coinCount)
-                BubbleChatView(message: currentPetMessage)
-                
-                PetPreviewCard()
-                    .frame(width: 191, height: 100)
-                    .padding(.bottom, 24)
-                
-                DailyProgressSectionView(stepCount: stepCount, stepGoal: stepGoal)
+        NavigationStack {
+            ZStack(alignment: .top) {
+                AppColor.dashboardBackground
+                    .ignoresSafeArea()
+
+                Image("Spotlight")
+                    .ignoresSafeArea()
+
+                VStack {
+                    DashboardHeaderView(
+                        coinCount: coinCount,
+                        onBoxTapped: {
+                            navigateToGachaPage = true
+                        },
+                        onClosetTapped: {
+                            navigateToDressUpPage = true
+                        }
+                    )
+
+                    BubbleChatView(message: currentPetMessage)
+
+                    PetPreviewCard()
+                        .frame(width: 191, height: 100)
+                        .padding(.bottom, 24)
+
+                    DailyProgressSectionView(
+                        stepCount: stepCount,
+                        stepGoal: stepGoal
+                    )
+                }
             }
-            
-            
+            .navigationDestination(isPresented: $navigateToGachaPage) {
+                GachaView()
+            }
+            .navigationDestination(isPresented: $navigateToDressUpPage) {
+                // nanti ganti ke dress up page
+                GachaView()
+            }
         }
         .task {
             await fetchTodayStepCount()
