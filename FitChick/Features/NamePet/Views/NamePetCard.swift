@@ -32,18 +32,24 @@ struct NamePetCard: View {
                 .focused($isPetNameFocused)
                 .textInputAutocapitalization(.words)
                 .autocorrectionDisabled()
+                .submitLabel(.done)
                 .padding(.horizontal, 16)
                 .frame(height: 46)
                 .background(
                     RoundedRectangle(cornerRadius: 9)
                         .fill(AppColor.secondary75Field)
                 )
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    isPetNameFocused = true
+                }
 
             PrimaryButton(title: "Save", isDisabled: isSaveDisabled) {
                 savePetName()
             }
         }
-        .onAppear {
+        .task {
+            try? await Task.sleep(for: .milliseconds(250))
             isPetNameFocused = true
         }
         .onSubmit {
@@ -57,6 +63,10 @@ struct NamePetCard: View {
             RoundedRectangle(cornerRadius: 14)
                 .fill(AppColor.secondary0Surface)
         )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            isPetNameFocused = false
+        }
         .fullScreenCover(isPresented: $navigateToDashboard) {
             DashboardView()
         }

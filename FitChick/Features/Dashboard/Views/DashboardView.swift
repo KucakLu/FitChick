@@ -6,22 +6,38 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct DashboardView: View {
-    private let petMessages = [
-        "Let’s walk with me!",
-        "Keep going!",
-        "You’re doing great!"
-    ]
     private let stepGoal = 8000
     private let healthStore = HealthStore()
     
+    @Query private var users: [UserAccount]
     @AppStorage("coinCount") private var coinCount = 0
     @State private var petMessageIndex = 0
     @State private var stepCount = 0
     
+    private var petMessages: [String] {
+        [
+            "Hallo my name is \(currentPetName)",
+            "Let’s walk with me!",
+            "Keep going!",
+            "You’re doing great!"
+        ]
+    }
+
     private var currentPetMessage: String {
         petMessages[petMessageIndex]
+    }
+
+    private var currentPetName: String {
+        let savedPetName = currentUser?.petName.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard let savedPetName, !savedPetName.isEmpty else {
+            return "Chick"
+        }
+
+        return savedPetName
     }
     
     var body: some View {
@@ -35,8 +51,8 @@ struct DashboardView: View {
                 BubbleChatView(message: currentPetMessage)
                 
                 PetPreviewCard()
-                    .frame(width: 191, height: 100)
-                    .padding(.bottom, 24)
+                    .frame(width: 360, height: 260)
+//                    .padding(.bottom, 8)
                 
                 DailyProgressSectionView(stepCount: stepCount, stepGoal: stepGoal)
             }
@@ -73,10 +89,24 @@ struct DashboardView: View {
             petMessageIndex = (petMessageIndex + 1) % petMessages.count
         }
     }
+
+    private var currentUser: UserAccount? {
+        guard let userId = KeychainManager.shared.retrieve(key: "appleUserId") else {
+            return users.first
+        }
+
+        return users.first { $0.userId == userId } ?? users.first
+    }
 }
 
 
 
 #Preview {
+    let container = try! ModelContainer(
+        for: UserAccount.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    )
+
     DashboardView()
+        .modelContainer(container)
 }
