@@ -9,9 +9,14 @@ import SwiftUI
 
 struct Onboarding2: View {
     let onNext: () -> Void
+    let onSkip: () -> Void
 
-    init(onNext: @escaping () -> Void = {}) {
+    init(
+        onNext: @escaping () -> Void = {},
+        onSkip: @escaping () -> Void = {}
+    ) {
         self.onNext = onNext
+        self.onSkip = onSkip
     }
 
     var body: some View {
@@ -34,8 +39,13 @@ struct Onboarding2: View {
                 .multilineTextAlignment(.center)
                 .font(AppFont.body)
                 .foregroundColor(.neutral600Subtext)
-                PrimaryButton(title: "Next") {
-                    onNext()
+                VStack(spacing: 8) {
+                    PrimaryButton(title: "Next") {
+                        onNext()
+                    }
+                    SkipButton(title: "Skip") {
+                        onSkip()
+                    }
                 }
             }
             .padding(.bottom, 64)
