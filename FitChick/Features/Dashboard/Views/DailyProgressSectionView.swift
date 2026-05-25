@@ -51,7 +51,7 @@ struct DailyProgressSectionView: View {
                         .padding(.bottom, 32)
                     }
                 }
-                .padding(.top, 16)
+                .padding(.top, 8)
                 .frame(maxWidth: .infinity)
             }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
