@@ -21,6 +21,7 @@ struct CollectButton: View {
     var body: some View {
         Button {
             if !isDisabled {
+                SoundManager.shared.playButtonSound()
                 action()
             }
         } label: {

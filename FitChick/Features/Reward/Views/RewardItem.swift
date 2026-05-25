@@ -46,6 +46,7 @@ struct RewardItem: View {
             }
             .onAppear {
                 isRotating.toggle()
+                SoundManager.shared.playGetRewardSound()
             }
         }
     }
