@@ -1,19 +1,21 @@
 //
-//  GachaView.swift
-//  FitChick
+//   GachaView.swift
+//   FitChick
 //
-//  Created by Vinka Alrezky As on 21/05/26.
+//   Created by Vinka Alrezky As on 21/05/26.
 //
 
 import SwiftUI
+
 
 struct GachaView: View {
     @Environment(\.dismiss) private var dismiss
     
     @AppStorage("coinCount") private var coinCount = 0
+    @AppStorage("totalGachaCount") private var totalGachaCount = 0
     
     @State private var showRewardView: Bool = false
-    @State private var selectedDrawType: Int = 1
+    @State private var selectedResultType: GachaResultType = .singleNormal
     @State private var navigateToCollectionPage = false
     
     var body: some View {
@@ -101,7 +103,7 @@ struct GachaView: View {
                 Spacer()
             }
             .fullScreenCover(isPresented: $showRewardView) {
-                GachaRewardView(drawType: selectedDrawType)
+                GachaRewardView(resultType: selectedResultType)
             }
             .navigationBarHidden(true)
             .navigationDestination(isPresented: $navigateToCollectionPage) {
@@ -109,20 +111,43 @@ struct GachaView: View {
             }
         }
     }
-
+    
     private func executeGacha(cost: Int, drawCount: Int) {
         if coinCount >= cost {
-            self.selectedDrawType = drawCount
-            self.showRewardView = true
-            
             coinCount -= cost
-            print("Coins deducted successfully! Remaining: \(coinCount)")
+            
+            if drawCount == 5 {
+                self.selectedResultType = .fiveDraw
+                
+                for _ in 1...5 {
+                    totalGachaCount += 1
+                }
+            } else {
+                totalGachaCount += 1
+                if totalGachaCount % 4 == 0 {
+                    self.selectedResultType = .singleRare
+                    print("Draw ke-\(totalGachaCount): FIXED RARE ITEM!")
+                } else {
+                    self.selectedResultType = .singleNormal
+                    print("Draw ke-\(totalGachaCount): Random Item Biasa.")
+                }
+            }
+            
+            print("Total Gacha saat ini: \(totalGachaCount) kali. Sisa koin: \(coinCount)")
+            self.showRewardView = true
         }
     }
 }
 
+enum GachaResultType {
+    case singleNormal
+    case singleRare
+    case fiveDraw
+}
+
 #Preview {
     let _ = UserDefaults.standard.set(100, forKey: "coinCount")
+    let _ = UserDefaults.standard.set(0, forKey: "totalGachaCount")
     
     return GachaView()
 }

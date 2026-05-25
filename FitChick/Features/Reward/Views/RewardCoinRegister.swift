@@ -42,7 +42,7 @@ struct RewardCoinRegister: View {
             }
         }
         .fullScreenCover(isPresented: $navigateToHatchView) {
-            HatchPage4s() // nanti ganti screen nya kemana
+            HatchView()
         }
     }
 }

@@ -1,8 +1,8 @@
 //
-//  GachaRewardView.swift
-//  FitChick
+//   GachaView.swift
+//   FitChick
 //
-//  Created by Vinka Alrezky As on 21/05/26.
+//   Created by Vinka Alrezky As on 21/05/26.
 //
 
 import SwiftUI
@@ -10,8 +10,8 @@ import SwiftUI
 struct GachaRewardView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var currentStep: Int = 1
-    let drawType: Int
     @State private var isRotating: Bool = true
+    let resultType: GachaResultType
     
     private var showReward: Bool { currentStep == 4 }
     
@@ -37,7 +37,6 @@ struct GachaRewardView: View {
                 CollectRewardButton(title: "Tap to collect") {
                     handleTapSequence()
                 }
-
                 .padding(.horizontal, 24)
                 .padding(.bottom, 94)
             }
@@ -46,12 +45,21 @@ struct GachaRewardView: View {
         .overlay(
             Group {
                 if currentStep == 4 {
-                    RewardItem()
-                        .transition(.asymmetric(
-                            insertion: .scale(scale: 0.8).combined(with: .opacity),
-                            removal: .opacity
-                        ))
-                        .zIndex(1)
+                    Group {
+                        switch resultType {
+                        case .singleNormal:
+                            RewardItem()
+                        case .singleRare:
+                            RewardRareItem()
+                        case .fiveDraw:
+                            RewardFiveItem()
+                        }
+                    }
+                    .transition(.asymmetric(
+                        insertion: .scale(scale: 0.8).combined(with: .opacity),
+                        removal: .opacity
+                    ))
+                    .zIndex(1)
                 }
             }
         )
@@ -76,7 +84,7 @@ struct GachaRewardView: View {
                 Image("ChestBox-4")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                // buat test pake reward coin dulu, nanti bakal ke item benerannya
+                
                 Image("RedRibbon")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
@@ -91,13 +99,11 @@ struct GachaRewardView: View {
             }
             .transition(.opacity)
         case 4:
-            // RewardItem is presented via overlay when currentStep == 4
             EmptyView()
         default:
             EmptyView()
         }
     }
-    
     
     private var currentRotationDegrees: Double {
         switch currentStep {
@@ -112,7 +118,7 @@ struct GachaRewardView: View {
             if currentStep < 3 {
                 currentStep += 1
             } else if currentStep == 3 {
-                currentStep = 4 // trigger RewardItem presentation
+                currentStep = 4
             } else {
                 dismiss()
             }
@@ -121,5 +127,5 @@ struct GachaRewardView: View {
 }
 
 #Preview {
-    GachaRewardView(drawType: 5)
+    GachaRewardView(resultType: .fiveDraw)
 }
