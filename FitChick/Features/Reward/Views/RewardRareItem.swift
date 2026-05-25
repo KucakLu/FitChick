@@ -12,6 +12,15 @@ struct RewardRareItem: View {
     @State private var navigateToDashboard: Bool = false
     
     let item: CollectionItem
+    let onCollect: (() -> Void)?
+    
+    init(
+        item: CollectionItem,
+        onCollect: (() -> Void)? = nil
+    ) {
+        self.item = item
+        self.onCollect = onCollect
+    }
     
     var body: some View {
         ZStack {
@@ -28,6 +37,7 @@ struct RewardRareItem: View {
                     VStack {
                         Image(item.svgAssetName)
                             .resizable()
+                            .aspectRatio(contentMode: .fit)
                             .frame(width: 234, height: 234)
                             .rotationEffect(isRotating ? Angle(degrees: 25) : Angle(degrees: -25))
                             .animation(
@@ -43,7 +53,11 @@ struct RewardRareItem: View {
                     .foregroundColor(AppColor.neutral100)
                 
                 CollectRewardButton(title: "Tap to collect") {
-                    navigateToDashboard = true
+                    if let onCollect {
+                        onCollect()
+                    } else {
+                        navigateToDashboard = true
+                    }
                 }
                 .fullScreenCover(isPresented: $navigateToDashboard) {
                     DashboardView()

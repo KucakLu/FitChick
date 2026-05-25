@@ -9,7 +9,13 @@ import SwiftUI
 
 struct DailyProgressSectionView: View {
     let stepCount: Int
-    let stepGoal: Int
+    let stepGoalFine: Int
+    let stepGoalGood: Int
+    let stepGoalExcellent: Int
+    let distanceCount: Double
+    let distanceGoalFine: Double
+    let distanceGoalGood: Double
+    let distanceGoalExcellent: Double
     
     var body: some View {
         Rectangle()
@@ -37,7 +43,7 @@ struct DailyProgressSectionView: View {
                     ScrollView {
                         VStack {
                             HStack {
-                                Text("Distance")
+                                Text("Step")
                                     .font(AppFont.title3)
                                 Spacer()
                             }
@@ -45,8 +51,24 @@ struct DailyProgressSectionView: View {
                             .padding(.horizontal, 24)
                             
                             VStack(spacing: 16) {
-                                DailyProgressCardView(stepCount: stepCount, stepGoal: stepGoal)
-                                DailyProgressCardView(stepCount: stepCount, stepGoal: 10000)
+                                DailyProgressCardView(stepCount: stepCount, stepGoal: stepGoalFine)
+                                DailyProgressCardView(stepCount: stepCount, stepGoal: stepGoalGood)
+                                DailyProgressCardView(stepCount: stepCount, stepGoal: stepGoalExcellent)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.bottom, 16)
+                            
+                            HStack {
+                                Text("Distance")
+                                    .font(AppFont.title3)
+                                Spacer()
+                            }
+                            .padding(.horizontal, 24)
+                            
+                            VStack(spacing: 16) {
+                                DailyProgressCardView(distanceCount: distanceCount, distanceGoal: distanceGoalFine)
+                                DailyProgressCardView(distanceCount: distanceCount, distanceGoal: distanceGoalGood)
+                                DailyProgressCardView(distanceCount: distanceCount, distanceGoal: distanceGoalExcellent)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.bottom, 32)
@@ -56,11 +78,20 @@ struct DailyProgressSectionView: View {
                 .padding(.top, 8)
                 .frame(maxWidth: .infinity)
             }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-        .ignoresSafeArea(.container, edges: .bottom)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+            .ignoresSafeArea(.container, edges: .bottom)
     }
 }
 
 #Preview {
-    DailyProgressSectionView(stepCount: 3200, stepGoal: 8000)
+    DailyProgressSectionView(
+        stepCount: 2400,
+        stepGoalFine: 8000,
+        stepGoalGood: 10000,
+        stepGoalExcellent: 12000,
+        distanceCount: 2.3,
+        distanceGoalFine: 6,
+        distanceGoalGood: 8,
+        distanceGoalExcellent: 10
+    )
 }

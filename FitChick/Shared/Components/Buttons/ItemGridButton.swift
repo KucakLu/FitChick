@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 enum ItemState {
     case normal
@@ -36,9 +39,7 @@ struct ItemGridButton: View {
             }
         } label: {
             ZStack {
-                Image(svgAssetName)
-                    .resizable()
-                    .scaledToFit()
+                ItemPreviewImage(assetName: svgAssetName)
                     .frame(width: ItemButtonSize.imageSize, height: ItemButtonSize.imageSize)
                     .opacity(1.0)
                 
@@ -172,11 +173,126 @@ private enum ItemButtonSize {
     static let contentHeight: CGFloat = 93
     static let totalHeight: CGFloat = 100
     static let cornerRadius: CGFloat = 20
-    static let imageSize: CGFloat = 52
+    static let imageSize: CGFloat = 68
     static let defaultShadowOffset: CGFloat = 7
     static let pressedShadowOffset: CGFloat = 7
     static let pressedOffset: CGFloat = 4
 }
+
+private struct ItemPreviewImage: View {
+    let assetName: String
+
+    var body: some View {
+        image
+            .resizable()
+            .scaledToFit()
+    }
+
+    private var image: Image {
+        #if canImport(UIKit)
+        if let image = ItemPreviewImageCache.image(named: assetName) {
+            return Image(uiImage: image)
+        }
+        #endif
+
+        return Image(assetName)
+    }
+}
+
+#if canImport(UIKit)
+private enum ItemPreviewImageCache {
+    private static let cache = NSCache<NSString, UIImage>()
+
+    static func image(named assetName: String) -> UIImage? {
+        let key = NSString(string: assetName)
+
+        if let cachedImage = cache.object(forKey: key) {
+            return cachedImage
+        }
+
+        guard let image = UIImage(named: assetName) else {
+            return nil
+        }
+
+        let previewImage = image.trimmingTransparentPixels() ?? image
+        cache.setObject(previewImage, forKey: key)
+        return previewImage
+    }
+}
+
+private extension UIImage {
+    func trimmingTransparentPixels(alphaThreshold: UInt8 = 8) -> UIImage? {
+        guard let cgImage else {
+            return nil
+        }
+
+        let width = cgImage.width
+        let height = cgImage.height
+        let bytesPerPixel = 4
+        let bytesPerRow = width * bytesPerPixel
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        var pixels = [UInt8](repeating: 0, count: height * bytesPerRow)
+
+        guard let context = CGContext(
+            data: &pixels,
+            width: width,
+            height: height,
+            bitsPerComponent: 8,
+            bytesPerRow: bytesPerRow,
+            space: colorSpace,
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else {
+            return nil
+        }
+
+        context.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
+
+        var minX = width
+        var minY = height
+        var maxX = -1
+        var maxY = -1
+
+        for y in 0..<height {
+            for x in 0..<width {
+                let alphaIndex = y * bytesPerRow + x * bytesPerPixel + 3
+
+                guard pixels[alphaIndex] > alphaThreshold else {
+                    continue
+                }
+
+                minX = min(minX, x)
+                minY = min(minY, y)
+                maxX = max(maxX, x)
+                maxY = max(maxY, y)
+            }
+        }
+
+        guard maxX >= minX, maxY >= minY else {
+            return nil
+        }
+
+        let cropRect = CGRect(
+            x: minX,
+            y: minY,
+            width: maxX - minX + 1,
+            height: maxY - minY + 1
+        )
+
+        guard cropRect.width < CGFloat(width) || cropRect.height < CGFloat(height) else {
+            return self
+        }
+
+        guard
+            let renderedImage = context.makeImage(),
+            let croppedImage = renderedImage.cropping(to: cropRect)
+        else {
+            return nil
+        }
+
+        return UIImage(cgImage: croppedImage, scale: scale, orientation: .up)
+    }
+}
+#endif
 
 
 #Preview {

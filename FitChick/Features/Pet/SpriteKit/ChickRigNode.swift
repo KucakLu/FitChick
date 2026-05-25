@@ -83,7 +83,7 @@ final class ChickRigNode: SKNode {
         static let headCenter = CGPoint(x: 150, y: 120)
         static let cockscombPivot = CGPoint(x: 150, y: 64)
         static let cockscombCenter = CGPoint(x: 150, y: 32)
-        static let beakCenter = CGPoint(x: 150, y: 192)
+        static let beakCenter = CGPoint(x: 150, y: 172)
         static let leftEyeCenter = CGPoint(x: 92, y: 128)
         static let rightEyeCenter = CGPoint(x: 208, y: 128)
 
@@ -404,7 +404,7 @@ final class ChickRigNode: SKNode {
         let socket: SKNode
         if item.assetName == "black_hat" {
             socket = backHeadSocket
-        } else if item.assetName == "headband" {
+        } else if item.assetName == "headband" || item.assetName == "burberry_cap" {
             socket = midHeadSocket
         } else if item.assetName == "dino_hat" {
             socket = fullHeadSocket
@@ -443,6 +443,8 @@ final class ChickRigNode: SKNode {
         
         let socket: SKNode
         if item.assetName == "astronaut_costume" {
+            socket = fullBodyCostumeSocket
+        } else if item.assetName == "set_of_magician" {
             socket = fullBodyCostumeSocket
         } else {
             socket = bodySocket
@@ -749,20 +751,86 @@ private struct ChickEquipmentLayout {
             )
         case "headband":
             return Self(
-                size: CGSize(width: 275, height: 275),
-                offset: CGPoint(x: 10, y: 40),
+                size: CGSize(width: 275, height: 200),
+                offset: CGPoint(x: 5, y: 40),
                 rotation: 0
             )
         case "dino_hat":
             return Self(
-                size: CGSize(width: 343, height: 355),
+                size: CGSize(width: 400, height: 380),
                 offset: CGPoint(x: 0, y: -24),
                 rotation: 0
             )
         case "baseball_cap":
             return Self(
-                size: CGSize(width: 181, height: 155),
+                size: CGSize(width: 200, height: 155),
                 offset: CGPoint(x: 0, y: 0),
+                rotation: 0
+            )
+        case "birthday_hat":
+            return Self(
+                size: CGSize(width: 400, height: 320),
+                offset: CGPoint(x: -60, y: 60),
+                rotation: 0.4
+            )
+        case "burberry_cap":
+            return Self(
+                size: CGSize(width: 440, height: 320),
+                offset: CGPoint(x: 0, y: 12),
+                rotation: 0
+            )
+        case "red_beret":
+            return Self(
+                size: CGSize(width: 420, height: 360),
+                offset: CGPoint(x: 0, y: 20),
+                rotation: 0
+            )
+        case "reindeer_hat":
+            return Self(
+                size: CGSize(width: 440, height: 360),
+                offset: CGPoint(x: 4, y: 48),
+                rotation: 0
+            )
+        case "artist_hat":
+            return Self(
+                size: CGSize(width: 320, height: 320),
+                offset: CGPoint(x:-14 , y: 20),
+                rotation: 0.05
+            )
+        case "police_hat":
+            return Self(
+                size: CGSize(width: 440, height: 400),
+                offset: CGPoint(x:0 , y: 30),
+                rotation: 0
+            )
+        case "witch_hat":
+            return Self(
+                size: CGSize(width: 440, height: 280),
+                offset: CGPoint(x:0 , y: 45),
+                rotation: 0
+            )
+        case "christmas_hat":
+            return Self(
+                size: CGSize(width: 360, height: 320),
+                offset: CGPoint(x:25 , y: 40),
+                rotation: -0.05
+            )
+        case "peter_hat":
+            return Self(
+                size: CGSize(width: 260, height: 200),
+                offset: CGPoint(x:10 , y: 60),
+                rotation: 0
+            )
+        case "circus_hat":
+            return Self(
+                size: CGSize(width: 540, height: 280),
+                offset: CGPoint(x:0 , y: 20),
+                rotation: 0
+            )
+        case "softball_cap":
+            return Self(
+                size: CGSize(width: 420, height: 300),
+                offset: CGPoint(x: 0, y: 10),
                 rotation: 0
             )
         default:
@@ -779,8 +847,44 @@ private struct ChickEquipmentLayout {
         case "RedRibbon":
             return Self(
                 size: CGSize(width: 98, height: 80),
-                offset: CGPoint(x: 5, y: -20),
+                offset: CGPoint(x: 5, y: -5),
                 rotation: 0.26
+            )
+        case "tie":
+            return Self(
+                size: CGSize(width: 290, height: 280),
+                offset: CGPoint(x: 0, y: -5),
+                rotation: 0
+            )
+        case "red_scarf":
+            return Self(
+                size: CGSize(width: 220, height: 220),
+                offset: CGPoint(x: 0, y: -20),
+                rotation: 0
+            )
+        case "necklace":
+            return Self(
+                size: CGSize(width: 520, height: 300),
+                offset: CGPoint(x: 0, y: -5),
+                rotation: 0
+            )
+        case "ruby":
+            return Self(
+                size: CGSize(width: 520, height: 300),
+                offset: CGPoint(x: 0, y: -5),
+                rotation: 0
+            )
+        case "love_necklace":
+            return Self(
+                size: CGSize(width: 520, height: 360),
+                offset: CGPoint(x: 0, y: -10),
+                rotation: 0
+            )
+        case "diamond":
+            return Self(
+                size: CGSize(width: 540, height: 360),
+                offset: CGPoint(x: 0, y: -5),
+                rotation: 0
             )
         default:
             return Self(
@@ -799,6 +903,18 @@ private struct ChickEquipmentLayout {
                 offset: CGPoint(x: 0, y: 0),
                 rotation: 0
             )
+        case "vr_glasses":
+            return Self(
+                size: CGSize(width: 360, height: 280),
+                offset: CGPoint(x: 0, y: 0),
+                rotation: 0
+            )
+        case "sunglasses":
+            return Self(
+                size: CGSize(width: 400, height: 360),
+                offset: CGPoint(x: 0, y: 0),
+                rotation: 0
+            )
         default:
             return Self(
                 size: CGSize(width: 220, height: 84),
@@ -814,6 +930,12 @@ private struct ChickEquipmentLayout {
             return Self(
                 size: CGSize(width: 300, height: 324),
                 offset: CGPoint(x: -6, y: 72),
+                rotation: 0
+            )
+        case "set_of_magician":
+            return Self(
+                size: CGSize(width: 400, height: 360),
+                offset: CGPoint(x: 0, y: 78),
                 rotation: 0
             )
         default:
