@@ -14,6 +14,10 @@ struct DressUpPageView: View {
     @Query private var users: [UserAccount]
     @AppStorage("coinCount") private var coinCount = 0
     @State private var stepCount = 0
+    @State private var navigateToDashboard = false
+    
+    @AppStorage(EquippedPetItems.storageKey)
+    private var equippedPetItemsStorage = EquippedPetItems.empty.encodedString
     
     private var currentPetName: String {
         let savedPetName = currentUser?.petName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -23,6 +27,10 @@ struct DressUpPageView: View {
         }
         
         return savedPetName
+    }
+    
+    private var hasSelectedItems: Bool {
+        equippedPetItemsStorage != EquippedPetItems.empty.encodedString
     }
     
     var body: some View {
@@ -41,8 +49,10 @@ struct DressUpPageView: View {
                         .font(AppFont.title1Bold)
                         .foregroundStyle(AppColor.secondary500Dark)
                     Spacer()
-                    SaveButton {
-                        print("Save tapped")
+                    SaveButton(
+                        isDisabled: !hasSelectedItems
+                    ) {
+                        navigateToDashboard = true
                     }
                 }
                 .padding(.horizontal, 24)
@@ -61,6 +71,9 @@ struct DressUpPageView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
         .ignoresSafeArea(.container, edges: .bottom)
+        .fullScreenCover(isPresented: $navigateToDashboard) {
+            DashboardView()
+        }
     }
     
     
