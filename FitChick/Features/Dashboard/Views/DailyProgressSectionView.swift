@@ -15,7 +15,7 @@ struct DailyProgressSectionView: View {
         Rectangle()
             .fill(AppColor.secondary50Surface)
             .frame(maxWidth: .infinity)
-            .frame(height: 406)
+            .frame(height: 354)
             .overlay(alignment: .top) {
                 VStack(spacing: 16) {
                     VStack {
@@ -35,20 +35,22 @@ struct DailyProgressSectionView: View {
                     .padding(.horizontal, 24)
                     
                     ScrollView {
-                        HStack {
-                            Text("Distance")
-                                .font(AppFont.title3)
-                            Spacer()
+                        VStack {
+                            HStack {
+                                Text("Distance")
+                                    .font(AppFont.title3)
+                                Spacer()
+                            }
+                            .padding(.top, 8)
+                            .padding(.horizontal, 24)
+                            
+                            VStack(spacing: 16) {
+                                DailyProgressCardView(stepCount: stepCount, stepGoal: stepGoal)
+                                DailyProgressCardView(stepCount: stepCount, stepGoal: 10000)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.bottom, 32)
                         }
-                        .padding(.top, 8)
-                        .padding(.horizontal, 24)
-                        
-                        VStack(spacing: 16) {
-                            DailyProgressCardView(stepCount: stepCount, stepGoal: stepGoal)
-                            DailyProgressCardView(stepCount: stepCount, stepGoal: 10000)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.bottom, 32)
                     }
                 }
                 .padding(.top, 8)

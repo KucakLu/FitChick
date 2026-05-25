@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PetPreviewCard: View {
-    private let cardSize = CGSize(width: 360, height: 300)
+    private let cardSize = CGSize(width: 360, height: 254)
     private let petSceneSize = CGSize(width: 250, height: 305)
     private let shadowWidth: CGFloat = 300
     private let contentYOffset: CGFloat = -2

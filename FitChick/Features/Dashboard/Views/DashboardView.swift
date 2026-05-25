@@ -51,7 +51,7 @@ struct DashboardView: View {
                 Image("Spotlight")
                     .ignoresSafeArea()
 
-                VStack {
+                VStack(spacing: 0) {
                     DashboardHeaderView(
                         coinCount: coinCount,
                         onBoxTapped: {
@@ -65,20 +65,25 @@ struct DashboardView: View {
                     BubbleChatView(message: currentPetMessage)
 
                    PetPreviewCard()
-                    .frame(width: 360, height: 260)
-
+                        Spacer()
+                    
                     DailyProgressSectionView(
                         stepCount: stepCount,
                         stepGoal: stepGoal
                     )
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+            .ignoresSafeArea(.container, edges: .bottom)
             .navigationDestination(isPresented: $navigateToGachaPage) {
                 GachaView()
             }
             .navigationDestination(isPresented: $navigateToDressUpPage) {
+                // nanti ganti ke dress up page
                 DressUpPageView()
+                    .toolbar(.hidden, for: .navigationBar)
             }
+            
         }
         .task {
             await fetchTodayStepCount()
