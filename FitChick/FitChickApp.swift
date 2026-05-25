@@ -13,7 +13,6 @@ struct FitChickApp: App {
     var body: some Scene {
         WindowGroup {
             Onboarding()
-//            RewardCoinRegister()
         }
         .modelContainer(for: UserAccount.self)
     }
