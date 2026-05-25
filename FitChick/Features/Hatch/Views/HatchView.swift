@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct HatchView: View {
     @State private var hasCompletedHatch: Bool = false
+    @State private var isNamePetCardVisible = false
     @State private var isChickVisible = false
     @State private var isChickIdleAnimating = false
     
@@ -18,9 +20,23 @@ struct HatchView: View {
             
             if hasCompletedHatch {
                 hatchedPetContent
+                    .contentShape(Rectangle())
+                    .onTapGesture(perform: showNamePetCard)
             } else {
                 hatchAnimationContent
             }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay(alignment: .bottom) {
+            namePetCardOverlay
+        }
+    }
+
+    private func showNamePetCard() {
+        guard isNamePetCardVisible == false else { return }
+
+        withAnimation(.easeOut(duration: 0.25)) {
+            isNamePetCardVisible = true
         }
     }
     
@@ -73,16 +89,35 @@ struct HatchView: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
                         withAnimation(.easeInOut(duration: 1).repeatForever(autoreverses: true)) {
                             isChickIdleAnimating = true
+                            SoundManager.shared.playGetPetSound()
                         }
                     }
                 }
             Spacer()
         }
         .padding(.top, 128)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
+    }
+
+    @ViewBuilder
+    private var namePetCardOverlay: some View {
+        if isNamePetCardVisible {
+            NamePetCard(autoFocus: false)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 56)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .zIndex(1)
+        }
     }
 }
 
 #Preview {
+    let container = try! ModelContainer(
+        for: UserAccount.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    )
+
     HatchView()
+        .modelContainer(container)
 }

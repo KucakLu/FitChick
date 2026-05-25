@@ -14,7 +14,7 @@ class UserAccount {
     @Attribute(.unique) var userId: String
     var petName: String
     var totalCoint: Int
-    
+
     init(userId: String, petName: String = "", totalCoint: Int = 0) {
         self.userId = userId
         self.petName = petName

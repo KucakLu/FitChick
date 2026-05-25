@@ -15,11 +15,15 @@ final class ChickRigNode: SKNode {
         static let beak = "beak.png"
         static let beakHalf = "beakHalf.png"
         static let beakOpen = "beakOpen.png"
-        static let leftEye = "leftEye.png"
+        static let leftEye = "eyeLeftOpen.png"
+        static let leftEyeThreeQuarter = "eyeLeftThreeQuarter.png"
         static let leftEyeHalf = "EyeLeftHalf.png"
+        static let leftEyeQuarter = "eyeLeftQuarter.png"
         static let leftEyeClose = "eyeLeftClose.png"
-        static let rightEye = "rightEye.png"
+        static let rightEye = "eyeRightOpen.png"
+        static let rightEyeThreeQuarter = "eyeRightThreeQuarter.png"
         static let rightEyeHalf = "EyeRightHalf.png"
+        static let rightEyeQuarter = "eyeRightQuarter.png"
         static let rightEyeClose = "eyeRightClose.png"
         static let leftFoot = "leftFeet.png"
         static let rightFoot = "rightFeet.png"
@@ -47,6 +51,14 @@ final class ChickRigNode: SKNode {
         static let poseLoop = "chick-pose-loop"
     }
 
+    private enum EyeFrame {
+        case open
+        case threeQuarter
+        case half
+        case quarter
+        case closed
+    }
+
     private enum Animation {
         static let cycleDuration: TimeInterval = 5.2
         static let wingScale: CGFloat = 0.84
@@ -63,8 +75,8 @@ final class ChickRigNode: SKNode {
     }
 
     private enum DesignPoint {
-        static let bodyPivot = CGPoint(x: 150, y: 214)
-        static let bodyCenter = CGPoint(x: 150, y: 214)
+        static let bodyPivot = CGPoint(x: 150, y: 208)
+        static let bodyCenter = CGPoint(x: 150, y: 208)
         static let neckBridgeCenter = CGPoint(x: 150, y: 204)
 
         static let headPivot = CGPoint(x: 150, y: 185)
@@ -541,26 +553,7 @@ final class ChickRigNode: SKNode {
     }
 
     private func applyExpression(cycleProgress: CGFloat) {
-        let eyesClosed = cycleProgress < 0.23 || (cycleProgress > 0.88 && cycleProgress < 0.93)
-        let eyesHalf = (cycleProgress >= 0.23 && cycleProgress < 0.29)
-            || (cycleProgress >= 0.93 && cycleProgress < 0.96)
-
-        if eyesClosed {
-            setEyeTextures(
-                left: TextureName.leftEyeClose,
-                right: TextureName.rightEyeClose
-            )
-        } else if eyesHalf {
-            setEyeTextures(
-                left: TextureName.leftEyeHalf,
-                right: TextureName.rightEyeHalf
-            )
-        } else {
-            setEyeTextures(
-                left: TextureName.leftEye,
-                right: TextureName.rightEye
-            )
-        }
+        setEyeTextures(for: eyeFrame(cycleProgress: cycleProgress))
 
         switch cycleProgress {
         case 0.48..<0.54, 0.64..<0.70:
@@ -569,6 +562,71 @@ final class ChickRigNode: SKNode {
             setBeakTexture(TextureName.beakOpen)
         default:
             setBeakTexture(TextureName.beak)
+        }
+    }
+
+    private func eyeFrame(cycleProgress: CGFloat) -> EyeFrame {
+        let blinkWindows: [(start: CGFloat, end: CGFloat)] = [
+            (0.16, 0.24),
+            (0.86, 0.92)
+        ]
+
+        for window in blinkWindows where cycleProgress >= window.start && cycleProgress < window.end {
+            let phase = (cycleProgress - window.start) / (window.end - window.start)
+            return eyeFrame(blinkPhase: phase)
+        }
+
+        return .open
+    }
+
+    private func eyeFrame(blinkPhase: CGFloat) -> EyeFrame {
+        switch blinkPhase {
+        case 0..<0.14:
+            return .threeQuarter
+        case 0.14..<0.28:
+            return .half
+        case 0.28..<0.4:
+            return .quarter
+        case 0.4..<0.5:
+            return .closed
+        case 0.5..<0.62:
+            return .quarter
+        case 0.62..<0.76:
+            return .half
+        case 0.76..<0.9:
+            return .threeQuarter
+        default:
+            return .open
+        }
+    }
+
+    private func setEyeTextures(for frame: EyeFrame) {
+        switch frame {
+        case .open:
+            setEyeTextures(
+                left: TextureName.leftEye,
+                right: TextureName.rightEye
+            )
+        case .threeQuarter:
+            setEyeTextures(
+                left: TextureName.leftEyeThreeQuarter,
+                right: TextureName.rightEyeThreeQuarter
+            )
+        case .half:
+            setEyeTextures(
+                left: TextureName.leftEyeHalf,
+                right: TextureName.rightEyeHalf
+            )
+        case .quarter:
+            setEyeTextures(
+                left: TextureName.leftEyeQuarter,
+                right: TextureName.rightEyeQuarter
+            )
+        case .closed:
+            setEyeTextures(
+                left: TextureName.leftEyeClose,
+                right: TextureName.rightEyeClose
+            )
         }
     }
 

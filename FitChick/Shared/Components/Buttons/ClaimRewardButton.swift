@@ -31,6 +31,7 @@ struct ClaimRewardButton: View {
     var body: some View {
         Button(action: {
             if !isDisabled {
+                SoundManager.shared.playButtonSound()
                 action()
             }
         }) {
