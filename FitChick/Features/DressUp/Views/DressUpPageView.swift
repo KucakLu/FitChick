@@ -18,8 +18,6 @@ struct DressUpPageView: View {
     @State private var draftEquippedItems: EquippedPetItems = .empty
     @State private var navigateToDashboard = false
 
-    @Environment(\.dismiss) private var dismiss
-
     private var savedEquippedItems: EquippedPetItems {
         EquippedPetItems(encodedString: equippedPetItemsStorage)
             .sanitizedForCurrentCatalog
@@ -132,8 +130,12 @@ struct DraftPetPreviewCard: View {
 
 struct DraftItemSectionView: View {
     @Binding var draftEquippedItems: EquippedPetItems
+    @AppStorage(CollectionData.unlockedStorageKey) private var unlockedStorageString = "{}"
 
-    private let items: [CollectionItem] = CollectionData.items.filter { $0.isOwned }
+    private var items: [CollectionItem] {
+        _ = unlockedStorageString
+        return CollectionData.items.filter { CollectionData.isItemOwned($0) }
+    }
 
     private let columns = [
         GridItem(.fixed(100), spacing: 16),
@@ -152,12 +154,15 @@ struct DraftItemSectionView: View {
                     ScrollView(.vertical, showsIndicators: false) {
                         LazyVGrid(columns: columns, spacing: 20) {
                             ForEach(items) { item in
+                                let isUnlocked = CollectionData.isItemOwned(item)
+
                                 ItemGridButton(
                                     svgAssetName: item.svgAssetName,
-                                    state: draftEquippedItems.isEquipped(item) ? .selected : .normal
+                                    state: itemState(for: item, isUnlocked: isUnlocked)
                                 ) {
                                     toggle(item)
                                 }
+                                .disabled(!isUnlocked)
                             }
                         }
                         .padding(.horizontal, 24)
@@ -172,6 +177,14 @@ struct DraftItemSectionView: View {
     private func toggle(_ item: CollectionItem) {
         draftEquippedItems.toggle(item)
     }
+
+    private func itemState(for item: CollectionItem, isUnlocked: Bool) -> ItemState {
+        guard isUnlocked else {
+            return .locked
+        }
+
+        return draftEquippedItems.isEquipped(item) ? .selected : .normal
+    }
 }
 
 #Preview {
@@ -183,4 +196,3 @@ struct DraftItemSectionView: View {
     DressUpPageView()
         .modelContainer(container)
 }
-
