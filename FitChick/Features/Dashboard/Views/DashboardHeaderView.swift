@@ -9,6 +9,18 @@ import SwiftUI
 
 struct DashboardHeaderView: View {
     let coinCount: Int
+    let onBoxTapped: () -> Void
+    let onClosetTapped: () -> Void
+
+    init(
+        coinCount: Int,
+        onBoxTapped: @escaping () -> Void = {},
+        onClosetTapped: @escaping () -> Void = {}
+    ) {
+        self.coinCount = coinCount
+        self.onBoxTapped = onBoxTapped
+        self.onClosetTapped = onClosetTapped
+    }
     
     var body: some View {
         HStack {
@@ -27,11 +39,11 @@ struct DashboardHeaderView: View {
             
             HStack {
                 IconButton(icon: Image(systemName: "shippingbox.fill")) {
-                    // some action to Gatcha page
+                    onBoxTapped()
                 }
                 
                 IconButton(icon: Image(systemName: "jacket.fill")) {
-                    // some action to Customization Pet Page
+                    onClosetTapped()
                 }
             }
         }
@@ -41,5 +53,13 @@ struct DashboardHeaderView: View {
 }
 
 #Preview {
-    DashboardHeaderView(coinCount: 120)
+    DashboardHeaderView(
+        coinCount: 120,
+        onBoxTapped: {
+            print("Bag tapped")
+        },
+        onClosetTapped: {
+            print("Closet tapped")
+        }
+    )
 }
