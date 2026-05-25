@@ -9,6 +9,8 @@ import SwiftUI
 import SwiftData
 
 struct DressUpPageView: View {
+    @Environment(\.dismiss) private var dismiss
+
     @Query private var users: [UserAccount]
     @AppStorage("coinCount") private var coinCount = 0
     @AppStorage(EquippedPetItems.storageKey) private var equippedPetItemsStorage = EquippedPetItems.empty.encodedString
@@ -64,6 +66,7 @@ struct DressUpPageView: View {
                     Spacer()
                     Text("Dress Up")
                         .font(AppFont.title1Bold)
+                        .foregroundStyle(AppColor.secondary500Dark)
                     Spacer()
                     SaveButton(isDisabled: !hasChanges) {
                         saveDraftAndDismiss()
@@ -89,6 +92,9 @@ struct DressUpPageView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
         .ignoresSafeArea(.container, edges: .bottom)
+        .fullScreenCover(isPresented: $navigateToDashboard) {
+            DashboardView()
+        }
     }
 
 

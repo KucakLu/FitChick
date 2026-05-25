@@ -25,6 +25,7 @@ struct SecondaryButton: View {
     var body: some View {
         Button {
             if !isDisabled {
+                SoundManager.shared.playButtonSound()
                 action()
             }
         } label: {

@@ -1,13 +1,13 @@
 //
-//  RewardItem.swift
+//  RewardRareItem.swift
 //  FitChick
 //
-//  Created by Syahra Zulya Shania Maghfiroh on 22/05/26.
+//  Created by Syahra Zulya Shania Maghfiroh on 25/05/26.
 //
 
 import SwiftUI
 
-struct RewardItem: View {
+struct RewardRareItem: View {
     @State private var isRotating: Bool = true
     @State private var navigateToDashboard: Bool = false
     
@@ -15,12 +15,12 @@ struct RewardItem: View {
     
     var body: some View {
         ZStack {
-            RewardAnimation()
+            RewardAnimationRare()
             
             VStack {
                 Text("Congratulations\nyou got a")
                     .font(AppFont.largeTitleBold)
-                    .foregroundColor(AppColor.secondary500Dark)
+                    .foregroundColor(AppColor.neutral100)
                     .padding(.bottom, 130)
                     .multilineTextAlignment(.center)
                 
@@ -40,7 +40,7 @@ struct RewardItem: View {
                 
                 Text(item.name.capitalized)
                     .font(AppFont.largeTitleBold)
-                    .foregroundColor(AppColor.secondary500Dark)
+                    .foregroundColor(AppColor.neutral100)
                 
                 CollectRewardButton(title: "Tap to collect") {
                     navigateToDashboard = true
@@ -59,7 +59,7 @@ struct RewardItem: View {
 }
 
 #Preview {
-    let sampleItem = CollectionData.items[0]
+    let sampleRareItem = CollectionData.items[3]
     
-    return RewardItem(item: sampleItem)
+    return RewardRareItem(item: sampleRareItem)
 }

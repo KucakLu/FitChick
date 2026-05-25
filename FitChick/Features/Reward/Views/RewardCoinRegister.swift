@@ -25,14 +25,14 @@ struct RewardCoinRegister: View {
                         Image("RewardCoin")
                             .resizable()
                             .frame(width: 234, height: 234)
-                        Text("+ 10 Coins")
+                        Text("+ 60 Coins")
                             .font(AppFont.largeTitleBold)
                     }
                 }
                 .padding(.bottom, 120)
                 
                 Button {
-                    coinCount += 10
+                    coinCount += 60
                     navigateToHatchView = true
                 } label: {
                     Text("Tap to collect the coin")
@@ -41,9 +41,8 @@ struct RewardCoinRegister: View {
                 }
             }
         }
-        .navigationDestination(isPresented: $navigateToHatchView) {
+        .fullScreenCover(isPresented: $navigateToHatchView) {
             HatchView()
-                .toolbar(.hidden, for: .navigationBar)
         }
     }
 }
