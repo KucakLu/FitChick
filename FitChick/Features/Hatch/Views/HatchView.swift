@@ -73,6 +73,7 @@ struct HatchView: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
                         withAnimation(.easeInOut(duration: 1).repeatForever(autoreverses: true)) {
                             isChickIdleAnimating = true
+                            SoundManager.shared.playGetPetSound()
                         }
                     }
                 }

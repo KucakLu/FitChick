@@ -21,6 +21,7 @@ struct CollectRewardButton: View {
 
     var body: some View {
         Button {
+            SoundManager.shared.playButtonSound()
             action()
         } label: {
             Text(title)

@@ -31,6 +31,7 @@ struct ItemGridButton: View {
     var body: some View {
         Button {
             if state != .locked {
+                SoundManager.shared.playButtonSound()
                 action()
             }
         } label: {

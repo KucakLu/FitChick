@@ -52,6 +52,7 @@ struct RewardRareItem: View {
             }
             .onAppear {
                 isRotating.toggle()
+                SoundManager.shared.playGetRewardSound()
             }
         }
     }
