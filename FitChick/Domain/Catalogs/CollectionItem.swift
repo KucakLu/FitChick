@@ -168,134 +168,64 @@ struct EquippedPetItems: Codable, Equatable {
     }
 }
 
+
 struct CollectionData {
     static let items: [CollectionItem] = [
-        CollectionItem(
-            name: "round glasses",
-            rarity: .reguler,
-            category: .face,
-            svgAssetName: "round_glasses",
-            isOwned: true
-        ),
-        CollectionItem(
-            name: "black hat",
-            rarity: .reguler,
-            category: .head,
-            svgAssetName: "black_hat",
-            isOwned: true
-        ),
-        CollectionItem(
-            name: "headband",
-            rarity: .reguler,
-            category: .head,
-            svgAssetName: "headband",
-            isOwned: true
-        ),
-        CollectionItem(
-            name: "red ribbon",
-            rarity: .rare,
-            category: .neck,
-            svgAssetName: "RedRibbon",
-            isOwned: true
-        ),
-        CollectionItem(
-            name: "dino hat",
-            rarity: .rare,
-            category: .head,
-            svgAssetName: "dino_hat",
-            isOwned: true
-        ),
-        CollectionItem(
-            name: "baseball cap",
-            rarity: .reguler,
-            category: .head,
-            svgAssetName: "baseball_cap",
-            isOwned: true
-        ),
-        CollectionItem(
-            name: "astronaut costume",
-            rarity: .reguler,
-            category: .body,
-            svgAssetName: "astronaut_costume",
-            isOwned: true
-        ),
-        CollectionItem(
-            name: "yellow jacket",
-            rarity: .reguler,
-            category: .body,
-            svgAssetName: "yellow_jacket",
-            isOwned: true
-        ),
-        CollectionItem(
-            name: "headband",
-            rarity: .reguler,
-            category: .head,
-            svgAssetName: "headband",
-            isOwned: false
-        ),
-        CollectionItem(
-            name: "headband",
-            rarity: .reguler,
-            category: .head,
-            svgAssetName: "headband",
-            isOwned: false
-        ),
-        CollectionItem(
-            name: "headband",
-            rarity: .reguler,
-            category: .head,
-            svgAssetName: "headband",
-            isOwned: false
-        ),
-        CollectionItem(
-            name: "headband",
-            rarity: .reguler,
-            category: .head,
-            svgAssetName: "headband",
-            isOwned: false
-        ),
-        CollectionItem(
-            name: "headband",
-            rarity: .reguler,
-            category: .head,
-            svgAssetName: "headband",
-            isOwned: false
-        ),
-        CollectionItem(
-            name: "headband",
-            rarity: .reguler,
-            category: .head,
-            svgAssetName: "headband",
-            isOwned: false
-        ),
-        CollectionItem(
-            name: "headband",
-            rarity: .reguler,
-            category: .head,
-            svgAssetName: "headband",
-            isOwned: false
-        ),
-        CollectionItem(
-            name: "headband",
-            rarity: .reguler,
-            category: .head,
-            svgAssetName: "headband",
-            isOwned: false
-        ),
-        CollectionItem(
-            name: "headband",
-            rarity: .reguler,
-            category: .head,
-            svgAssetName: "headband",
-            isOwned: false
-        ),
+        CollectionItem(name: "round glasses", rarity: .reguler, category: .face, svgAssetName: "round_glasses", isOwned: true),
+        CollectionItem(name: "black hat", rarity: .reguler, category: .head, svgAssetName: "black_hat", isOwned: true),
+        CollectionItem(name: "headband", rarity: .reguler, category: .head, svgAssetName: "headband", isOwned: true),
+        CollectionItem(name: "red ribbon", rarity: .rare, category: .neck, svgAssetName: "RedRibbon", isOwned: true),
+        CollectionItem(name: "dino hat", rarity: .rare, category: .head, svgAssetName: "dino_hat", isOwned: true),
+        CollectionItem(name: "baseball cap", rarity: .reguler, category: .head, svgAssetName: "baseball_cap", isOwned: true),
+        CollectionItem(name: "astronaut costume", rarity: .reguler, category: .body, svgAssetName: "astronaut_costume", isOwned: true),
+        CollectionItem(name: "yellow jacket", rarity: .reguler, category: .body, svgAssetName: "yellow_jacket", isOwned: true),
+        
+        // ini masih perlu di revisi
+        CollectionItem(name: "cute glasses", rarity: .reguler, category: .face, svgAssetName: "cute_glasses", isOwned: false),
+        CollectionItem(name: "crown hat", rarity: .rare, category: .head, svgAssetName: "crown_hat", isOwned: false),
+        CollectionItem(name: "gold necklace", rarity: .rare, category: .neck, svgAssetName: "gold_necklace", isOwned: false),
+        CollectionItem(name: "blue hoodie", rarity: .reguler, category: .body, svgAssetName: "blue_hoodie", isOwned: false),
+        CollectionItem(name: "sport headband", rarity: .reguler, category: .head, svgAssetName: "sport_headband", isOwned: false),
+        CollectionItem(name: "winter scarf", rarity: .reguler, category: .neck, svgAssetName: "winter_scarf", isOwned: false)
     ]
 
+    static let unlockedStorageKey = "unlockedGachaItems"
+    
+
     static func isOwnedEquipment(_ equipment: EquippedPetItem) -> Bool {
-        items.contains { item in
-            item.isOwned
+        let unlockedItems = UserDefaults.standard.stringArray(forKey: unlockedStorageKey) ?? []
+        
+        return items.contains { item in
+            let currentOwnership = item.isOwned || unlockedItems.contains(item.svgAssetName)
+            
+            return currentOwnership
                 && item.category == equipment.category
                 && item.svgAssetName == equipment.assetName
         }
+    }
+}
+
+struct UnlockedItems: Codable {
+    var assetNames: [String] = []
+
+    init(assetNames: [String] = []) {
+        self.assetNames = assetNames
+    }
+
+    init(encodedString: String) {
+        guard let data = encodedString.data(using: .utf8),
+              let decoded = try? JSONDecoder().decode(UnlockedItems.self, from: data) else {
+            self = UnlockedItems()
+            return
+        }
+        self = decoded
+    }
+
+    var encodedString: String {
+        guard let data = try? JSONEncoder().encode(self),
+              let string = String(data: data, encoding: .utf8) else {
+            return "{}"
+        }
+        return string
     }
 }

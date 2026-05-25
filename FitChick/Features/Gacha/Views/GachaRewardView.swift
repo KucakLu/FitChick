@@ -10,35 +10,22 @@ import SwiftUI
 struct GachaRewardView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var currentStep: Int = 1
-    @State private var isRotating: Bool = true
     let resultType: GachaResultType
-    
-    private var showReward: Bool { currentStep == 4 }
+    @State private var isRotating: Bool = true
     
     var body: some View {
         ZStack {
             RewardAnimation()
             
             VStack(spacing: 0) {
-                Color.clear
-                    .frame(height: 114)
-                
+                Color.clear.frame(height: 114)
                 Spacer()
-                
-                ZStack {
-                    chestImageView
-                }
-                .frame(width: 260, height: 260)
-                .rotationEffect(.degrees(currentRotationDegrees))
-                .scaleEffect(currentStep == 2 ? 1.05 : 1.0)
-                
+                ZStack { chestImageView }.frame(width: 260, height: 260)
+                    .rotationEffect(.degrees(currentRotationDegrees))
+                    .scaleEffect(currentStep == 2 ? 1.05 : 1.0)
                 Spacer()
-                
-                CollectRewardButton(title: "Tap to collect") {
-                    handleTapSequence()
-                }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 94)
+                CollectRewardButton(title: "Tap to collect") { handleTapSequence() }
+                    .padding(.horizontal, 24).padding(.bottom, 94)
             }
             .ignoresSafeArea(.all, edges: .bottom)
         }
@@ -47,18 +34,15 @@ struct GachaRewardView: View {
                 if currentStep == 4 {
                     Group {
                         switch resultType {
-                        case .singleNormal:
-                            RewardItem()
-                        case .singleRare:
-                            RewardRareItem()
-                        case .fiveDraw:
-                            RewardFiveItem()
+                        case .singleNormal(let item):
+                            RewardItem(item: item)
+                        case .singleRare(let item):
+                            RewardRareItem(item: item)
+                        case .fiveDraw(let items):
+                            RewardFiveItem(items: items)
                         }
                     }
-                    .transition(.asymmetric(
-                        insertion: .scale(scale: 0.8).combined(with: .opacity),
-                        removal: .opacity
-                    ))
+                    .transition(.asymmetric(insertion: .scale(scale: 0.8).combined(with: .opacity), removal: .opacity))
                     .zIndex(1)
                 }
             }
@@ -70,22 +54,14 @@ struct GachaRewardView: View {
     private var chestImageView: some View {
         switch currentStep {
         case 1:
-            Image("ChestBox-2")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .transition(.opacity)
+            Image("ChestBox-2").resizable().aspectRatio(contentMode: .fit)
         case 2:
-            Image("ChestBox-3")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .transition(.opacity)
+            Image("ChestBox-3").resizable().aspectRatio(contentMode: .fit)
         case 3:
             ZStack(alignment: .center) {
-                Image("ChestBox-4")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
+                Image("ChestBox-4").resizable().aspectRatio(contentMode: .fill)
                 
-                Image("RedRibbon")
+                Image(getPreviewAssetName())
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 90, height: 90)
@@ -97,11 +73,17 @@ struct GachaRewardView: View {
                         }
                     }
             }
-            .transition(.opacity)
-        case 4:
-            EmptyView()
         default:
             EmptyView()
+        }
+    }
+    
+    private func getPreviewAssetName() -> String {
+        switch resultType {
+        case .singleNormal(let item), .singleRare(let item):
+            return item.svgAssetName
+        case .fiveDraw(let items):
+            return items.first?.svgAssetName ?? "RedRibbon"
         }
     }
     
@@ -127,5 +109,6 @@ struct GachaRewardView: View {
 }
 
 #Preview {
-    GachaRewardView(resultType: .fiveDraw)
+    let sampleItems = Array(CollectionData.items.prefix(5))
+    return GachaRewardView(resultType: .fiveDraw(sampleItems))
 }
