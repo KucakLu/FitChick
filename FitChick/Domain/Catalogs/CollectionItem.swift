@@ -187,7 +187,7 @@ struct CollectionData {
         CollectionItem(name: "artist hat", rarity: .reguler, category: .head, svgAssetName: "artist_hat", isOwned: false),
         CollectionItem(name: "vr glasses", rarity: .reguler, category: .face, svgAssetName: "vr_glasses", isOwned: false),
         CollectionItem(name: "police hat", rarity: .reguler, category: .head, svgAssetName: "police_hat", isOwned: false),
-        CollectionItem(name: "tie", rarity: .reguler, category: .body, svgAssetName: "tie", isOwned: false)
+        CollectionItem(name: "tie", rarity: .reguler, category: .body, svgAssetName: "tie", isOwned: false),
         CollectionItem(name: "witch hat", rarity: .reguler, category: .head, svgAssetName: "witch_hat", isOwned: false),
         CollectionItem(name: "christmas hat", rarity: .reguler, category: .head, svgAssetName: "christmas_hat", isOwned: false),
         CollectionItem(name: "sunglasses", rarity: .reguler, category: .face, svgAssetName: "sunglasses", isOwned: false),
