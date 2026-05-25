@@ -18,8 +18,6 @@ struct DressUpPageView: View {
     @State private var draftEquippedItems: EquippedPetItems = .empty
     @State private var navigateToDashboard = false
 
-    @Environment(\.dismiss) private var dismiss
-
     private var savedEquippedItems: EquippedPetItems {
         EquippedPetItems(encodedString: equippedPetItemsStorage)
             .sanitizedForCurrentCatalog
