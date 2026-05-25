@@ -41,9 +41,8 @@ struct RewardCoinRegister: View {
                 }
             }
         }
-        .navigationDestination(isPresented: $navigateToHatchView) {
-            HatchView()
-                .toolbar(.hidden, for: .navigationBar)
+        .fullScreenCover(isPresented: $navigateToHatchView) {
+            HatchPage4s() // nanti ganti screen nya kemana
         }
     }
 }
