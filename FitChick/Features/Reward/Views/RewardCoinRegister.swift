@@ -8,43 +8,54 @@
 import SwiftUI
 
 struct RewardCoinRegister: View {
-    @AppStorage("coinCount") private var coinCount = 0    
+    @AppStorage("coinCount") private var coinCount = 0
     @State private var isRotating: Bool = false
     @State private var navigateToHatchView: Bool = false
     
     var body: some View {
-        ZStack {
-            RewardBg(scale: 1.1)
-            VStack {
-                Text("Register Reward")
-                    .font(AppFont.largeTitleBold)
-                    .padding(.bottom, 80)
-                ZStack {
-                    Image("OvalReward")
-                    VStack {
-                        Image("RewardCoin")
-                            .resizable()
-                            .frame(width: 234, height: 234)
-                        Text("+ 10 Coins")
-                            .font(AppFont.largeTitleBold)
+        NavigationStack {
+            ZStack {
+                RewardBg(scale: 1.3)
+                VStack {
+                    Text("Register Reward")
+                        .font(AppFont.largeTitleBold)
+                        .padding(.bottom, 80)
+                    ZStack {
+                        Image("OvalReward")
+                        VStack {
+                            Image("RewardCoin")
+                                .resizable()
+                                .frame(width: 234, height: 234)
+                            Text("+ 10 Coins")
+                                .font(AppFont.largeTitleBold)
+                        }
                     }
-                }
-                .padding(.bottom, 120)
-                
-                Button {
-                    coinCount += 10
-                    navigateToHatchView = true
-                } label: {
+                    .padding(.bottom, 120)
+
                     Text("Tap to collect the coin")
                         .font(AppFont.bodyBold)
                         .foregroundColor(.black)
                 }
             }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                collectReward()
+            }
+            .navigationDestination(isPresented: $navigateToHatchView) {
+                HatchView()
+                    .toolbar(.hidden, for: .navigationBar)
+            }
+            .toolbar(.hidden, for: .navigationBar)
         }
-        .navigationDestination(isPresented: $navigateToHatchView) {
-            HatchView()
-                .toolbar(.hidden, for: .navigationBar)
+    }
+
+    private func collectReward() {
+        guard navigateToHatchView == false else {
+            return
         }
+
+        coinCount += 10
+        navigateToHatchView = true
     }
 }
 

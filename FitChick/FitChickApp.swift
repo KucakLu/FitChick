@@ -12,7 +12,8 @@ import SwiftData
 struct FitChickApp: App {
     var body: some Scene {
         WindowGroup {
-            Onboarding()
+//            Onboarding()
+            RewardCoinRegister()
         }
         .modelContainer(for: UserAccount.self)
     }
