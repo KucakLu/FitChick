@@ -65,7 +65,27 @@ struct EquippedPetItems: Codable, Equatable {
             }
         }
 
-        return sanitizedItems
+        return sanitizedItems.singleSelection
+    }
+
+    var singleSelection: EquippedPetItems {
+        // Older storage could keep one item per category; collapse it to one visible choice.
+        let equippedCategories = ItemCategory.allCases.filter { self[$0] != nil }
+
+        guard equippedCategories.count > 1 else {
+            return self
+        }
+
+        guard
+            let preservedCategory = equippedCategories.last,
+            let preservedItem = self[preservedCategory]
+        else {
+            return .empty
+        }
+
+        var selectedItems = EquippedPetItems()
+        selectedItems[preservedCategory] = preservedItem
+        return selectedItems
     }
 
     init(
@@ -111,13 +131,13 @@ struct EquippedPetItems: Codable, Equatable {
     }
 
     mutating func toggle(_ item: CollectionItem) {
-        let equippedItem = EquippedPetItem(item: item)
-
         if isEquipped(item) {
-            self[item.category] = nil
-        } else {
-            self[item.category] = equippedItem
+            self = .empty
+            return
         }
+
+        self = .empty
+        self[item.category] = EquippedPetItem(item: item)
     }
 
     subscript(category: ItemCategory) -> EquippedPetItem? {
@@ -155,7 +175,7 @@ struct CollectionData {
             rarity: .reguler,
             category: .face,
             svgAssetName: "round_glasses",
-            isOwned: false
+            isOwned: true
         ),
         CollectionItem(
             name: "black hat",
@@ -179,32 +199,32 @@ struct CollectionData {
             isOwned: true
         ),
         CollectionItem(
-            name: "headband",
-            rarity: .reguler,
+            name: "dino hat",
+            rarity: .rare,
             category: .head,
-            svgAssetName: "headband",
+            svgAssetName: "dino_hat",
             isOwned: true
         ),
         CollectionItem(
-            name: "headband",
+            name: "baseball cap",
             rarity: .reguler,
             category: .head,
-            svgAssetName: "headband",
+            svgAssetName: "baseball_cap",
             isOwned: true
         ),
         CollectionItem(
-            name: "headband",
+            name: "astronaut costume",
             rarity: .reguler,
-            category: .head,
-            svgAssetName: "headband",
-            isOwned: false
+            category: .body,
+            svgAssetName: "astronaut_costume",
+            isOwned: true
         ),
         CollectionItem(
-            name: "headband",
+            name: "yellow jacket",
             rarity: .reguler,
-            category: .head,
-            svgAssetName: "headband",
-            isOwned: false
+            category: .body,
+            svgAssetName: "yellow_jacket",
+            isOwned: true
         ),
         CollectionItem(
             name: "headband",

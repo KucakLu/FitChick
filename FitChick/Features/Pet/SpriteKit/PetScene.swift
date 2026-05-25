@@ -10,8 +10,9 @@ import SpriteKit
 import SwiftUI
 
 final class PetScene: SKScene {
-    static let referenceSize = CGSize(width: 380, height: 380)
+    static let referenceSize = CGSize(width: 380, height: 460)
     static let referenceAspectRatio = referenceSize.width / referenceSize.height
+    private static let chickVerticalOffset: CGFloat = -64
 
     private let chickNode: ChickRigNode
 
@@ -88,7 +89,7 @@ final class PetScene: SKScene {
 
         chickNode.position = CGPoint(
             x: size.width / 2,
-            y: size.height / 2
+            y: size.height / 2 + Self.chickVerticalOffset * scale
         )
         chickNode.setScale(scale)
     }

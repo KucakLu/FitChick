@@ -28,7 +28,6 @@ struct DressUpPageView: View {
             AppColor.dashboardBackground.edgesIgnoringSafeArea(.all)
             Image("Spotlight")
                 .ignoresSafeArea()
-            //            Spacer()
             
             VStack {
                 HStack {
@@ -44,17 +43,20 @@ struct DressUpPageView: View {
                     }
                 }
                 .padding(.horizontal, 24)
-                .padding(.top, 72)
                 .frame(maxWidth: .infinity, alignment: .init(horizontal: .center, vertical: .center))
+
                 
                 Text("\(currentPetName)")
                     .font(AppFont.title1Bold)
                 
+                Spacer()
                 PetPreviewCard()
-                
+
                 ItemSectionView()
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        .ignoresSafeArea(.container, edges: .bottom)
     }
     
     

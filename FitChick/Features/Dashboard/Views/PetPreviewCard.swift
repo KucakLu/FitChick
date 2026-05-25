@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct PetPreviewCard: View {
-    private let cardSize = CGSize(width: 360, height: 260)
-    private let petSceneSize = CGSize(width: 250, height: 250)
+    private let cardSize = CGSize(width: 360, height: 300)
+    private let petSceneSize = CGSize(width: 250, height: 305)
     private let shadowWidth: CGFloat = 300
     private let contentYOffset: CGFloat = -2
     @AppStorage(EquippedPetItems.storageKey) private var equippedPetItemsStorage = EquippedPetItems.empty.encodedString

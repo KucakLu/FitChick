@@ -24,7 +24,7 @@ struct ItemSectionView: View {
         Rectangle()
             .fill(AppColor.secondary50Surface)
             .frame(maxWidth: .infinity)
-            .frame(height: 480)
+            .frame(height: 380)
             .overlay(alignment: .top) {
                 VStack(spacing: 0) {
                     Text("")
@@ -41,10 +41,7 @@ struct ItemSectionView: View {
                         }
                         .padding(.horizontal, 24)
                         .padding(.top, 4)
-                        .padding(.bottom, 32)
-                        
                     }
-//                    .padding(.top, 24)
                 }
             }
             .navigationBarHidden(true)
@@ -52,7 +49,7 @@ struct ItemSectionView: View {
                 DashboardView()
             }
             .onAppear(perform: removeUnavailableEquipment)
-//        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
         .ignoresSafeArea(.container, edges: .bottom)
     }
 

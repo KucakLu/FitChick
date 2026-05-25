@@ -30,12 +30,16 @@ final class ChickRigNode: SKNode {
     private enum NodeName {
         static let rig = "chickRig"
         static let headSocket = "headSocket"
+        static let midHeadSocket = "midHeadSocket"
+        static let backHeadSocket = "backHeadSocket"
         static let faceSocket = "faceSocket"
+        static let fullHeadSocket = "fullFaceSocket"
         static let bodySocket = "bodySocket"
         static let neckSocket = "neckSocket"
         static let hatItem = "hatItem"
         static let glassesItem = "glassesItem"
         static let clothesItem = "clothesItem"
+        static let fullBodyCostumeSocket = "fullBodyCostumeSocket"
         static let scarfItem = "scarfItem"
     }
 
@@ -113,9 +117,13 @@ final class ChickRigNode: SKNode {
     private lazy var rightFootArt = makeRigSprite(TextureName.rightFoot, zPosition: 0)
 
     private let headSocket = SKNode()
+    private let midHeadSocket = SKNode()
+    private let backHeadSocket = SKNode()
     private let faceSocket = SKNode()
+    private let fullHeadSocket = SKNode()
     private let bodySocket = SKNode()
     private let neckSocket = SKNode()
+    private let fullBodyCostumeSocket = SKNode()
 
     private var leftEyeTextureName = TextureName.leftEye
     private var rightEyeTextureName = TextureName.rightEye
@@ -152,10 +160,37 @@ final class ChickRigNode: SKNode {
     }
 
     func updateEquipment(_ equipment: EquippedPetItems) {
-        equip(equipment.head, in: headSocket, nodeName: NodeName.hatItem)
-        equip(equipment.face, in: faceSocket, nodeName: NodeName.glassesItem)
-        equip(equipment.body, in: bodySocket, nodeName: NodeName.clothesItem)
-        equip(equipment.neck, in: neckSocket, nodeName: NodeName.scarfItem)
+        let equipment = equipment.singleSelection
+
+        // Render only one selected equipment item at a time.
+        backHeadSocket.removeAllChildren()
+        headSocket.removeAllChildren()
+        midHeadSocket.removeAllChildren()
+        faceSocket.removeAllChildren()
+        fullHeadSocket.removeAllChildren()
+        bodySocket.removeAllChildren()
+        neckSocket.removeAllChildren()
+        fullBodyCostumeSocket.removeAllChildren()
+
+        if let headItem = equipment.head {
+            equipHead(headItem)
+            return
+        }
+
+        if let faceItem = equipment.face {
+            equip(faceItem, in: faceSocket, nodeName: NodeName.glassesItem)
+            return
+        }
+
+        if let bodyItem = equipment.body {
+            equipBody(bodyItem)
+            return
+        }
+
+        if let neckItem = equipment.neck {
+            equipNeck(neckItem)
+            return
+        }
     }
 
     private func setupRig() {
@@ -268,10 +303,31 @@ final class ChickRigNode: SKNode {
         cockscombPivot.addChild(cockscomb)
 
         configureSocket(
+            backHeadSocket,
+            name: NodeName.backHeadSocket,
+            designPoint: DesignPoint.headSocket,
+            zPosition: -1,
+            parent: headPivot
+        )
+        configureSocket(
             headSocket,
             name: NodeName.headSocket,
             designPoint: DesignPoint.headSocket,
             zPosition: 30,
+            parent: headPivot
+        )
+        configureSocket(
+            midHeadSocket,
+            name: NodeName.midHeadSocket,
+            designPoint: DesignPoint.headSocket,
+            zPosition: 4,
+            parent: headPivot
+        )
+        configureSocket(
+            fullHeadSocket,
+            name: NodeName.fullHeadSocket,
+            designPoint: DesignPoint.headSocket,
+            zPosition: 8,
             parent: headPivot
         )
         configureSocket(
@@ -286,6 +342,13 @@ final class ChickRigNode: SKNode {
             name: NodeName.neckSocket,
             designPoint: DesignPoint.neckSocket,
             zPosition: 24,
+            parent: headPivot
+        )
+        configureSocket(
+            fullBodyCostumeSocket,
+            name: NodeName.fullBodyCostumeSocket,
+            designPoint: DesignPoint.bodySocket,
+            zPosition: 8,
             parent: headPivot
         )
     }
@@ -315,6 +378,65 @@ final class ChickRigNode: SKNode {
         socket.position = relativeScenePoint(designPoint, to: parent.position)
         socket.zPosition = zPosition
         parent.addChild(socket)
+    }
+
+    private func equipHead(_ item: EquippedPetItem?) {
+        backHeadSocket.removeAllChildren()
+        headSocket.removeAllChildren()
+        midHeadSocket.removeAllChildren()
+
+        guard let item else {
+            return
+        }
+
+        let socket: SKNode
+        if item.assetName == "black_hat" {
+            socket = backHeadSocket
+        } else if item.assetName == "headband" {
+            socket = midHeadSocket
+        } else if item.assetName == "dino_hat" {
+            socket = fullHeadSocket
+        } else {
+            socket = headSocket
+        }
+        equip(item, in: socket, nodeName: NodeName.hatItem)
+    }
+
+    private func equipNeck(_ item: EquippedPetItem?) {
+        neckSocket.removeAllChildren()
+
+        guard let item else {
+            return
+        }
+
+        equip(item, in: neckSocket, nodeName: NodeName.scarfItem)
+    }
+    
+    private func equipFace(_ item: EquippedPetItem?) {
+        faceSocket.removeAllChildren()
+
+        guard let item else {
+            return
+        }
+
+        equip(item, in: faceSocket, nodeName: NodeName.glassesItem)
+    }
+    
+    private func equipBody(_ item: EquippedPetItem?) {
+        neckSocket.removeAllChildren()
+
+        guard let item else {
+            return
+        }
+        
+        let socket: SKNode
+        if item.assetName == "astronaut_costume" {
+            socket = fullBodyCostumeSocket
+        } else {
+            socket = bodySocket
+        }
+
+        equip(item, in: socket, nodeName: NodeName.clothesItem)
     }
 
     private func equip(
@@ -551,23 +673,11 @@ private struct ChickEquipmentLayout {
         case .head:
             return headLayout(for: item.assetName)
         case .face:
-            return Self(
-                size: CGSize(width: 126, height: 50),
-                offset: .zero,
-                rotation: 0
-            )
+            return faceLayout(for: item.assetName)
         case .body:
-            return Self(
-                size: CGSize(width: 150, height: 112),
-                offset: CGPoint(x: 0, y: 0),
-                rotation: 0
-            )
+            return bodyLayout(for: item.assetName)
         case .neck:
-            return Self(
-                size: CGSize(width: 96, height: 84),
-                offset: CGPoint(x: 0, y: -8),
-                rotation: 0
-            )
+            return neckLayout(for: item.assetName)
         }
     }
 
@@ -575,20 +685,83 @@ private struct ChickEquipmentLayout {
         switch assetName {
         case "black_hat":
             return Self(
-                size: CGSize(width: 104, height: 76),
-                offset: CGPoint(x: 0, y: 0),
+                size: CGSize(width: 308, height: 145),
+                offset: CGPoint(x: 0, y: 54),
                 rotation: 0
             )
         case "headband":
             return Self(
-                size: CGSize(width: 132, height: 116),
-                offset: CGPoint(x: 0, y: -22),
+                size: CGSize(width: 275, height: 275),
+                offset: CGPoint(x: 10, y: 40),
+                rotation: 0
+            )
+        case "dino_hat":
+            return Self(
+                size: CGSize(width: 343, height: 355),
+                offset: CGPoint(x: 0, y: -24),
+                rotation: 0
+            )
+        case "baseball_cap":
+            return Self(
+                size: CGSize(width: 181, height: 155),
+                offset: CGPoint(x: 0, y: 0),
                 rotation: 0
             )
         default:
             return Self(
                 size: CGSize(width: 112, height: 88),
                 offset: CGPoint(x: 0, y: -4),
+                rotation: 0
+            )
+        }
+    }
+
+    private static func neckLayout(for assetName: String) -> ChickEquipmentLayout {
+        switch assetName {
+        case "RedRibbon":
+            return Self(
+                size: CGSize(width: 98, height: 80),
+                offset: CGPoint(x: 5, y: -20),
+                rotation: 0.26
+            )
+        default:
+            return Self(
+                size: CGSize(width: 112, height: 88),
+                offset: CGPoint(x: 5, y: -20),
+                rotation: 0
+            )
+        }
+    }
+    
+    private static func faceLayout(for assetName: String) -> ChickEquipmentLayout {
+        switch assetName {
+        case "round_glasses":
+            return Self(
+                size: CGSize(width: 220, height: 84),
+                offset: CGPoint(x: 0, y: 0),
+                rotation: 0
+            )
+        default:
+            return Self(
+                size: CGSize(width: 220, height: 84),
+                offset: CGPoint(x: 0, y: 0),
+                rotation: 0
+            )
+        }
+    }
+    
+    private static func bodyLayout(for assetName: String) -> ChickEquipmentLayout {
+        switch assetName {
+        case "astronaut_costume":
+            return Self(
+                size: CGSize(width: 300, height: 324),
+                offset: CGPoint(x: -6, y: 72),
+                rotation: 0
+            )
+        default:
+            return Self(
+                size: CGSize(width: 296, height: 276),
+                offset: CGPoint(x: 0, y: 64),
                 rotation: 0
             )
         }
