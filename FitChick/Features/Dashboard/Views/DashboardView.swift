@@ -77,8 +77,7 @@ struct DashboardView: View {
                 GachaView()
             }
             .navigationDestination(isPresented: $navigateToDressUpPage) {
-                // nanti ganti ke dress up page
-                GachaView()
+                DressUpPageView()
             }
         }
         .task {

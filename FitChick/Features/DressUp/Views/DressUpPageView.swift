@@ -9,6 +9,8 @@ import SwiftUI
 import SwiftData
 
 struct DressUpPageView: View {
+    @Environment(\.dismiss) private var dismiss
+
     @Query private var users: [UserAccount]
     @AppStorage("coinCount") private var coinCount = 0
     @State private var stepCount = 0
@@ -31,12 +33,13 @@ struct DressUpPageView: View {
             
             VStack {
                 HStack {
-                    DismissButton(variant: .red) {
-                        print("Dismiss Red Clicked")
+                    DismissButton(variant: .secondary) {
+                        dismiss()
                     }
                     Spacer()
                     Text("Dress Up")
                         .font(AppFont.title1Bold)
+                        .foregroundStyle(AppColor.secondary500Dark)
                     Spacer()
                     SaveButton {
                         print("Save tapped")
@@ -47,7 +50,8 @@ struct DressUpPageView: View {
 
                 
                 Text("\(currentPetName)")
-                    .font(AppFont.title1Bold)
+                    .font(AppFont.title3)
+                    .foregroundStyle(AppColor.neutral800Text)
                 
                 Spacer()
                 PetPreviewCard()
