@@ -9,7 +9,10 @@ import SwiftUI
 
 struct CollectionView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var items: [CollectionItem] = CollectionData.items.sorted { $0.isOwned && !$1.isOwned }
+    
+    @State private var items: [CollectionItem] = CollectionData.items.sorted {
+        CollectionData.isItemOwned($0) && !CollectionData.isItemOwned($1)
+    }
     @State private var navigateToDashboard = false
     
     private let columns = [
@@ -19,7 +22,7 @@ struct CollectionView: View {
     ]
     
     private var ownedCountText: String {
-        let ownedCount = items.filter { $0.isOwned }.count
+        let ownedCount = items.filter { CollectionData.isItemOwned($0) }.count
         return "\(ownedCount)/\(items.count)"
     }
     
@@ -53,11 +56,12 @@ struct CollectionView: View {
                     LazyVGrid(columns: columns, spacing: 20) {
                         ForEach(items) { item in
                             
-                            let buttonState: ItemState = item.isOwned ? .normal : .locked
+                            let isUnlocked = CollectionData.isItemOwned(item)
+                            let buttonState: ItemState = isUnlocked ? .normal : .locked
                             
                             ItemGridButton(svgAssetName: item.svgAssetName, state: buttonState) {
                             }
-                            .disabled(true)
+                            .disabled(!isUnlocked) 
                         }
                     }
                     .padding(.horizontal, 24)

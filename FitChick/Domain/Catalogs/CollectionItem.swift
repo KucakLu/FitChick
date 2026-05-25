@@ -191,12 +191,18 @@ struct CollectionData {
 
     static let unlockedStorageKey = "unlockedGachaItems"
     
+    static func isItemOwned(_ item: CollectionItem) -> Bool {
+        if item.isOwned { return true }
+        
+        let jsonString = UserDefaults.standard.string(forKey: unlockedStorageKey) ?? "{}"
+        let unlockedContainer = UnlockedItems(encodedString: jsonString)
+        
+        return unlockedContainer.assetNames.contains(item.svgAssetName)
+    }
 
     static func isOwnedEquipment(_ equipment: EquippedPetItem) -> Bool {
-        let unlockedItems = UserDefaults.standard.stringArray(forKey: unlockedStorageKey) ?? []
-        
         return items.contains { item in
-            let currentOwnership = item.isOwned || unlockedItems.contains(item.svgAssetName)
+            let currentOwnership = isItemOwned(item)
             
             return currentOwnership
                 && item.category == equipment.category
