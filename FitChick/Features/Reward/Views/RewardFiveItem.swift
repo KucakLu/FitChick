@@ -37,6 +37,7 @@ struct RewardFiveItem: View {
                     VStack {
                         Image(currentItem.svgAssetName)
                             .resizable()
+                            .aspectRatio(contentMode: .fit)
                             .frame(width: 234, height: 234)
                             .rotationEffect(.degrees(isRotating ? 25 : -25))
                             .animation(

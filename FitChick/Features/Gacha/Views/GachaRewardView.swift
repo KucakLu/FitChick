@@ -20,9 +20,16 @@ struct GachaRewardView: View {
             VStack(spacing: 0) {
                 Color.clear.frame(height: 114)
                 Spacer()
-                ZStack { chestImageView }.frame(width: 260, height: 260)
-                    .rotationEffect(.degrees(currentRotationDegrees))
-                    .scaleEffect(currentStep == 2 ? 1.05 : 1.0)
+                ZStack {
+                    GachaCasAnimationView(phase: caseOpeningPhase)
+                        .frame(width: 280, height: 280)
+
+                    if currentStep == 3 {
+                        previewItemImage
+                            .transition(.scale(scale: 0.72).combined(with: .opacity))
+                    }
+                }
+                .frame(width: 280, height: 280)
                 Spacer()
                 CollectRewardButton(title: "Tap to collect") { handleTapSequence() }
                     .padding(.horizontal, 24).padding(.bottom, 94)
@@ -51,31 +58,18 @@ struct GachaRewardView: View {
     }
     
     @ViewBuilder
-    private var chestImageView: some View {
-        switch currentStep {
-        case 1:
-            Image("ChestBox-2").resizable().aspectRatio(contentMode: .fit).transition(.opacity)
-        case 2:
-            Image("ChestBox-3").resizable().aspectRatio(contentMode: .fit).transition(.opacity)
-        case 3:
-            ZStack(alignment: .center) {
-                Image("ChestBox-4").resizable().aspectRatio(contentMode: .fill).transition(.opacity)
-                
-                Image(getPreviewAssetName())
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 90, height: 90)
-                    .rotationEffect(isRotating ? Angle(degrees: 10) : Angle(degrees: -10))
-                    .offset(y: -40)
-                    .onAppear {
-                        withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
-                            isRotating.toggle()
-                        }
-                    }
+    private var previewItemImage: some View {
+        Image(getPreviewAssetName())
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(width: 90, height: 90)
+            .rotationEffect(isRotating ? Angle(degrees: 10) : Angle(degrees: -10))
+            .offset(y: -42)
+            .onAppear {
+                withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                    isRotating.toggle()
+                }
             }
-        default:
-            EmptyView()
-        }
     }
     
     private func getPreviewAssetName() -> String {
@@ -87,11 +81,14 @@ struct GachaRewardView: View {
         }
     }
     
-    private var currentRotationDegrees: Double {
+    private var caseOpeningPhase: CaseOpeningPhase {
         switch currentStep {
-        case 1: return -5
-        case 2: return 5
-        default: return 0
+        case 1:
+            return .closed
+        case 2:
+            return .shaking
+        default:
+            return .open
         }
     }
     
