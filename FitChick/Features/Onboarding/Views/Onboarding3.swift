@@ -40,7 +40,6 @@ struct Onboarding3: View {
             }
             .presentationDetents([.height(290), .medium])
             .presentationDragIndicator(.visible)
-            .interactiveDismissDisabled()
         }
         .toolbar(.hidden, for: .navigationBar)
     }

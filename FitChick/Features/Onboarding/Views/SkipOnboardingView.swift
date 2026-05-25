@@ -112,7 +112,6 @@ struct SkipOnboardingView: View {
             }
             .presentationDetents([.height(290), .medium])
             .presentationDragIndicator(.visible)
-            .interactiveDismissDisabled()
         }
     }
 }
