@@ -16,6 +16,8 @@ struct DashboardView: View {
     @AppStorage("coinCount") private var coinCount = 0
     @State private var petMessageIndex = 0
     @State private var stepCount = 0
+    @State private var navigateToGachaPage = false
+    @State private var navigateToDressUpPage = false
     
     private var petMessages: [String] {
         [
@@ -41,23 +43,43 @@ struct DashboardView: View {
     }
     
     var body: some View {
-        ZStack(alignment: .top) {
-            AppColor.dashboardBackground.edgesIgnoringSafeArea(.all)
-            Image("Spotlight")
-                .ignoresSafeArea()
-            
-            VStack {
-                DashboardHeaderView(coinCount: coinCount)
-                BubbleChatView(message: currentPetMessage)
-                
-                PetPreviewCard()
+        NavigationStack {
+            ZStack(alignment: .top) {
+                AppColor.dashboardBackground
+                    .ignoresSafeArea()
+
+                Image("Spotlight")
+                    .ignoresSafeArea()
+
+                VStack {
+                    DashboardHeaderView(
+                        coinCount: coinCount,
+                        onBoxTapped: {
+                            navigateToGachaPage = true
+                        },
+                        onClosetTapped: {
+                            navigateToDressUpPage = true
+                        }
+                    )
+
+                    BubbleChatView(message: currentPetMessage)
+
+                   PetPreviewCard()
                     .frame(width: 360, height: 260)
-//                    .padding(.bottom, 8)
-                
-                DailyProgressSectionView(stepCount: stepCount, stepGoal: stepGoal)
+
+                    DailyProgressSectionView(
+                        stepCount: stepCount,
+                        stepGoal: stepGoal
+                    )
+                }
             }
-            
-            
+            .navigationDestination(isPresented: $navigateToGachaPage) {
+                GachaView()
+            }
+            .navigationDestination(isPresented: $navigateToDressUpPage) {
+                // nanti ganti ke dress up page
+                GachaView()
+            }
         }
         .task {
             await fetchTodayStepCount()
@@ -98,8 +120,6 @@ struct DashboardView: View {
         return users.first { $0.userId == userId } ?? users.first
     }
 }
-
-
 
 #Preview {
     let container = try! ModelContainer(

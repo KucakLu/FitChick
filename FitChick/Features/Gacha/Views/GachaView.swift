@@ -5,31 +5,25 @@
 //  Created by Vinka Alrezky As on 21/05/26.
 //
 
-
 import SwiftUI
-import SwiftData
 
 struct GachaView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var modelContext
     
-    @Query var users: [UserAccount]
+    @AppStorage("coinCount") private var coinCount = 0
     
     @State private var showRewardView: Bool = false
     @State private var selectedDrawType: Int = 1
     @State private var navigateToCollectionPage = false
     
     var body: some View {
-        let userTotalCoint = users.first?.totalCoint ?? 50
-        
-        let isButton1xDisabled = userTotalCoint < 10 && !showRewardView
-        let isButton5xDisabled = userTotalCoint < 50 && !showRewardView
+        let isButton1xDisabled = coinCount < 10 && !showRewardView
+        let isButton5xDisabled = coinCount < 50 && !showRewardView
         
         ZStack {
             RewardAnimation()
             
             VStack(spacing: 0) {
-                
                 HStack(alignment: .center, spacing: 12) {
                     Spacer()
                     
@@ -37,7 +31,7 @@ struct GachaView: View {
                         dismiss()
                     }
                     Spacer()
-                            .frame(width: 50)
+                        .frame(width: 50)
                     
                     HStack(spacing: 6) {
                         Image("RewardCoin")
@@ -45,7 +39,7 @@ struct GachaView: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 28, height: 28)
                         
-                        Text("\(userTotalCoint)")
+                        Text("\(coinCount)")
                             .font(AppFont.title1Bold)
                             .foregroundStyle(AppColor.secondary500Dark)
                     }
@@ -53,7 +47,7 @@ struct GachaView: View {
                     .padding(.vertical, 6)
                     
                     Spacer()
-                            .frame(width: 50)
+                        .frame(width: 50)
 
                     IconButton(icon: Image("collectibleIcon")) {
                         navigateToCollectionPage = true
@@ -107,40 +101,28 @@ struct GachaView: View {
                 Spacer()
             }
             .fullScreenCover(isPresented: $showRewardView) {
-                        GachaRewardView(drawType: selectedDrawType)
+                GachaRewardView(drawType: selectedDrawType)
             }
             .navigationBarHidden(true)
             .navigationDestination(isPresented: $navigateToCollectionPage) {
                 CollectionView()
             }
-        
         }
     }
 
     private func executeGacha(cost: Int, drawCount: Int) {
-        if let currentUser = users.first, currentUser.totalCoint >= cost {
+        if coinCount >= cost {
             self.selectedDrawType = drawCount
             self.showRewardView = true
-        
-            currentUser.totalCoint -= cost
-                do {
-                    try modelContext.save()
-                    print("Coins deducted successfully!")
-                } catch {
-                    print("Failed to save coin data: \(error.localizedDescription)")
-                }
+            
+            coinCount -= cost
+            print("Coins deducted successfully! Remaining: \(coinCount)")
         }
     }
 }
 
-// coba testing disini
 #Preview {
-    let container = try! ModelContainer(for: UserAccount.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
-    
-    let dummyUser = UserAccount(userId: "", petName: "", totalCoint: 100)
-    
-    container.mainContext.insert(dummyUser)
+    let _ = UserDefaults.standard.set(100, forKey: "coinCount")
     
     return GachaView()
-        .modelContainer(container)
 }
