@@ -9,13 +9,26 @@ import SwiftUI
 import SwiftData
 
 struct DashboardView: View {
+    
+    
+    private let stepGoalFine = 8000
+    private let stepGoalGood = 10000
+    private let stepGoalExcellent = 12000
+
+    
+    private let distanceGoalFine = 6.0
+    private let distanceGoalGood = 8.0
+    private let distanceGoalExcellent = 10.0
+    
     private let stepGoal = 8000
+    private let distanceGoal = 5.0
     private let healthStore = HealthStore()
     
     @Query private var users: [UserAccount]
     @AppStorage("coinCount") private var coinCount = 0
     @State private var petMessageIndex = 0
     @State private var stepCount = 0
+    @State private var distanceCount = 0.0
     @State private var navigateToGachaPage = false
     @State private var navigateToDressUpPage = false
     
@@ -69,7 +82,13 @@ struct DashboardView: View {
                     
                     DailyProgressSectionView(
                         stepCount: stepCount,
-                        stepGoal: stepGoal
+                        stepGoalFine: stepGoalFine,
+                        stepGoalGood: stepGoalGood,
+                        stepGoalExcellent: stepGoalExcellent,
+                        distanceCount: distanceCount,
+                        distanceGoalFine: distanceGoalFine,
+                        distanceGoalGood: distanceGoalGood,
+                        distanceGoalExcellent: distanceGoalExcellent
                     )
                 }
             }
@@ -86,20 +105,50 @@ struct DashboardView: View {
             
         }
         .task {
-            await fetchTodayStepCount()
+            await fetchTodayActivityProgress()
+        }
+        .task {
+            await observeStepCountUpdates()
+        }
+        .task {
+            await observeDistanceUpdates()
+        }
+        .task {
             await rotatePetMessages()
         }
     }
     
-    private func fetchTodayStepCount() async {
+    @MainActor
+    private func fetchTodayActivityProgress() async {
         do {
             let steps = try await healthStore.fetchStepCount()
             stepCount = Int(steps)
         } catch {
             print(error.localizedDescription)
         }
+
+        do {
+            distanceCount = try await healthStore.fetchWalkingRunningDistance()
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+
+    @MainActor
+    private func observeStepCountUpdates() async {
+        for await steps in healthStore.stepCountUpdates() {
+            stepCount = Int(steps)
+        }
+    }
+
+    @MainActor
+    private func observeDistanceUpdates() async {
+        for await distance in healthStore.walkingRunningDistanceUpdates() {
+            distanceCount = distance
+        }
     }
     
+    @MainActor
     private func rotatePetMessages() async {
         guard petMessages.count > 1 else {
             return
