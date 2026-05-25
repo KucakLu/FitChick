@@ -10,6 +10,7 @@ import SwiftUI
 enum DismissButtonVariant {
     case neutral
     case secondary
+    case red
 }
 
 struct DismissButton: View {
@@ -33,11 +34,20 @@ struct DismissButton: View {
         } label: {
             icon
                 .font(.system(size: 22, weight: .bold))
-                .foregroundStyle(Color(.init(white: 0.15, alpha: 1.0)))
+                .foregroundStyle(foregroundColor)
                 .frame(width: DismissButtonSize.contentWidth)
                 .frame(height: DismissButtonSize.contentHeight)
         }
         .buttonStyle(DismissButtonStyle(variant: variant))
+    }
+
+    private var foregroundColor: Color {
+        switch variant {
+        case .neutral, .secondary:
+            return Color(.init(white: 0.15, alpha: 1.0))
+        case .red:
+            return .white
+        }
     }
 }
 
@@ -62,14 +72,21 @@ private struct DismissButtonStyle: ButtonStyle {
     private var backgroundColor: Color {
         switch variant {
         case .neutral:
-            return AppColor.neutral100
+            return .white
         case .secondary:
             return AppColor.secondary100
+        case .red:
+            return AppColor.error300Main
         }
     }
 
     private var shadowColor: Color {
-        AppColor.neutral400
+        switch variant {
+        case .neutral, .secondary:
+            return AppColor.neutral400
+        case .red:
+            return AppColor.error500Dark
+        }
     }
 
     private func bottomLayer(isPressed: Bool) -> some View {
@@ -84,7 +101,7 @@ private struct DismissButtonStyle: ButtonStyle {
 private enum DismissButtonSize {
     static let contentWidth: CGFloat = 48
     static let contentHeight: CGFloat = 42
-    static let totalHeight: CGFloat = 54
+    static let totalHeight: CGFloat = 48
 
     static let cornerRadius: CGFloat = 10
 
@@ -103,5 +120,9 @@ private enum DismissButtonSize {
 
     DismissButton(variant: .secondary) {
         print("Dismiss Secondary Clicked")
+    }
+
+    DismissButton(variant: .red) {
+        print("Dismiss Red Clicked")
     }
 }

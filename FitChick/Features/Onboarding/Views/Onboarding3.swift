@@ -8,9 +8,15 @@
 import SwiftUI
 
 struct Onboarding3: View {
+    let onSkip: () -> Void
+    
     @State private var showLoginSheet = false
     @State private var shouldNavigateToConnectHealth = false
     @State private var isShowingConnectHealth = false
+    
+    init(onSkip: @escaping () -> Void = {}) {
+        self.onSkip = onSkip
+    }
     
     var body: some View {
         Group {
@@ -34,7 +40,6 @@ struct Onboarding3: View {
             }
             .presentationDetents([.height(290), .medium])
             .presentationDragIndicator(.visible)
-            .interactiveDismissDisabled()
         }
         .toolbar(.hidden, for: .navigationBar)
     }
@@ -59,8 +64,13 @@ struct Onboarding3: View {
                 .multilineTextAlignment(.center)
                 .font(AppFont.body)
                 .foregroundColor(.neutral600Subtext)
-                PrimaryButton(title: "Next") {
-                    showLoginSheet = true
+                VStack(spacing: 8) {
+                    PrimaryButton(title: "Next") {
+                        showLoginSheet = true
+                    }
+                    SecondaryButton(title: "Skip") {
+                        onSkip()
+                    }
                 }
             }
             .padding(.bottom, 64)

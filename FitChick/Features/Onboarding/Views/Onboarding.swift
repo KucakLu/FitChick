@@ -8,18 +8,32 @@
 import SwiftUI
 
 struct Onboarding: View {
-    @State private var isShowingOnboarding1 = false
+    @AppStorage("isLoggedIn") private var isLoggedIn = false
+    
+    private enum Screen {
+        case splash
+        case onboarding1
+        case dashboard
+    }
+    
+    @State private var currentScreen: Screen = .splash
 
     var body: some View {
-        if isShowingOnboarding1 {
-            Onboarding1()
-                .transition(.opacity)
-        } else {
-            onboardingContent
-                .transition(.opacity)
-                .task {
-                    await showNextPageAfterDelay()
-                }
+        Group {
+            switch currentScreen {
+            case .splash:
+                onboardingContent
+                    .transition(.opacity)
+                    .task {
+                        await showNextPageAfterDelay()
+                    }
+            case .onboarding1:
+                Onboarding1()
+                    .transition(.opacity)
+            case .dashboard:
+                DashboardView()
+                    .transition(.opacity)
+            }
         }
     }
 
@@ -46,7 +60,11 @@ struct Onboarding: View {
         try? await Task.sleep(nanoseconds: 3_000_000_000)
 
         withAnimation(.easeInOut(duration: 0.3)) {
-            isShowingOnboarding1 = true
+            if isLoggedIn {
+                currentScreen = .dashboard
+            } else {
+                currentScreen = .onboarding1
+            }
         }
     }
 }

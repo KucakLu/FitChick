@@ -14,17 +14,20 @@ struct HatchAnimationView: View {
     private let contentMode: ContentMode
     private let fallbackImageName: String
     private let isPlaying: Bool
+    private let onCompletion: (() -> Void)?
 
     init(
         assetName: String = "HatchAnimation",
         contentMode: ContentMode = .fit,
         fallbackImageName: String = "EggStage4",
-        isPlaying: Bool = true
+        isPlaying: Bool = true,
+        onCompletion: (() -> Void)? = nil
     ) {
         self.assetName = assetName
         self.contentMode = contentMode
         self.fallbackImageName = fallbackImageName
         self.isPlaying = isPlaying
+        self.onCompletion = onCompletion
     }
 
     var body: some View {
@@ -32,7 +35,8 @@ struct HatchAnimationView: View {
             assetName: assetName,
             contentMode: contentMode,
             fallbackImageName: fallbackImageName,
-            isPlaying: isPlaying
+            isPlaying: isPlaying,
+            onCompletion: onCompletion
         )
         .clipped()
         .accessibilityLabel("Hatch animation")
@@ -44,6 +48,7 @@ private struct HatchAnimatedGIFView: UIViewRepresentable {
     let contentMode: ContentMode
     let fallbackImageName: String
     let isPlaying: Bool
+    let onCompletion: (() -> Void)?
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -72,15 +77,18 @@ private struct HatchAnimatedGIFView: UIViewRepresentable {
         }
 
         if isPlaying {
-            imageView.startAnimating()
+            context.coordinator.startAnimating(imageView, onCompletion: onCompletion)
         } else {
-            imageView.stopAnimating()
+            context.coordinator.stopAnimating(imageView)
         }
     }
 
     final class Coordinator {
         private var activeConfigurationKey: String?
         private var cachedAnimations: [String: HatchAnimatedGIF] = [:]
+        private var completionWorkItem: DispatchWorkItem?
+        private var isAnimationRunning = false
+        private var currentAnimationDuration: TimeInterval = 0
 
         func configure(
             _ imageView: UIImageView,
@@ -97,16 +105,54 @@ private struct HatchAnimatedGIFView: UIViewRepresentable {
                 imageView.image = animation.frames.first
                 imageView.animationImages = animation.frames
                 imageView.animationDuration = animation.duration
-                imageView.animationRepeatCount = 0
+                imageView.animationRepeatCount = 1
+                currentAnimationDuration = animation.duration
             } else {
-                imageView.stopAnimating()
+                stopAnimating(imageView)
                 imageView.image = UIImage(named: fallbackImageName)
                 imageView.animationImages = nil
                 imageView.animationDuration = 0
-                imageView.animationRepeatCount = 0
+                imageView.animationRepeatCount = 1
+                currentAnimationDuration = 0
             }
 
             activeConfigurationKey = configurationKey
+        }
+
+        func startAnimating(
+            _ imageView: UIImageView,
+            onCompletion: (() -> Void)?
+        ) {
+            guard isAnimationRunning == false else {
+                return
+            }
+
+            isAnimationRunning = true
+            imageView.startAnimating()
+
+            completionWorkItem?.cancel()
+            let workItem = DispatchWorkItem { [weak self] in
+                guard let self else {
+                    return
+                }
+
+                self.isAnimationRunning = false
+                imageView.stopAnimating()
+                onCompletion?()
+            }
+
+            completionWorkItem = workItem
+            DispatchQueue.main.asyncAfter(
+                deadline: .now() + currentAnimationDuration,
+                execute: workItem
+            )
+        }
+
+        func stopAnimating(_ imageView: UIImageView) {
+            completionWorkItem?.cancel()
+            completionWorkItem = nil
+            isAnimationRunning = false
+            imageView.stopAnimating()
         }
 
         private func animatedGIF(named assetName: String) -> HatchAnimatedGIF? {
