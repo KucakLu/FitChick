@@ -67,7 +67,7 @@ struct CollectionView: View {
             }
         }
         .navigationBarHidden(true)
-        .navigationDestination(isPresented: $navigateToDashboard) {
+        .fullScreenCover(isPresented: $navigateToDashboard) {
             DashboardView()
         }
     }

@@ -56,8 +56,8 @@ struct SkipOnboardingView: View {
                         VStack(spacing: 12) {
 
                             Text("Your egg is waiting to hatch!")
-                                .font(AppFont.body)
-                                .foregroundColor(AppColor.neutral600Subtext)
+                                .font(AppFont.bodyBold)
+                                .foregroundColor(AppColor.neutral800Text)
                                 .multilineTextAlignment(.center)
 
                             Text("""
@@ -112,7 +112,6 @@ struct SkipOnboardingView: View {
             }
             .presentationDetents([.height(290), .medium])
             .presentationDragIndicator(.visible)
-            .interactiveDismissDisabled()
         }
     }
 }
