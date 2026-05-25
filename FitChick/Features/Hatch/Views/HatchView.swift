@@ -8,35 +8,13 @@
 import SwiftUI
 
 struct HatchView: View {
-    @State private var isRotating: Bool = false
     @State private var hasCompletedHatch: Bool = false
     @State private var isChickVisible = false
     @State private var isChickIdleAnimating = false
     
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: [
-                    AppColor.secondary0Surface,
-                    AppColor.secondary300Main
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-            
-            Image("RewardBg")
-                .scaleEffect(hasCompletedHatch ? 1.1 : 1.3)
-                .rotationEffect(.degrees(isRotating ? 360 : 0))
-                .animation(
-                    .linear(duration: 3)
-                    .repeatForever(autoreverses: false),
-                    value: isRotating
-                )
-                .onAppear {
-                    isRotating = true
-                }
-                .ignoresSafeArea()
+            RewardBg(scale: hasCompletedHatch ? 1.1 : 1.3)
             
             if hasCompletedHatch {
                 hatchedPetContent

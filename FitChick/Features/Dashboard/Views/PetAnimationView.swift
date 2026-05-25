@@ -12,6 +12,7 @@ import UIKit
 struct PetAnimationView: View {
     private let animationName: String
     private let fileExtension: String
+    private let equipment: EquippedPetItems
     private let contentMode: ContentMode
     private let fallbackImageName: String
     private let isPlaying: Bool
@@ -19,12 +20,14 @@ struct PetAnimationView: View {
     init(
         animationName: String = "PetBlinkAnimation",
         fileExtension: String = "gif",
-        contentMode: ContentMode = .fill,
+        equipment: EquippedPetItems = .empty,
+        contentMode: ContentMode = .fit,
         fallbackImageName: String = "ChickIddle",
         isPlaying: Bool = true
     ) {
         self.animationName = animationName
         self.fileExtension = fileExtension
+        self.equipment = equipment
         self.contentMode = contentMode
         self.fallbackImageName = fallbackImageName
         self.isPlaying = isPlaying
@@ -32,14 +35,21 @@ struct PetAnimationView: View {
 
     var body: some View {
         AnimatedGIFView(
-            animationName: animationName,
+            animationName: currentAnimationName,
             fileExtension: fileExtension,
             contentMode: contentMode,
             fallbackImageName: fallbackImageName,
             isPlaying: isPlaying
         )
-        .clipped()
         .accessibilityLabel("Pet animation")
+    }
+
+    private var currentAnimationName: String {
+        if equipment.hasBlackHatEquipped {
+            return "BlackHatPetAnimation"
+        }
+
+        return animationName
     }
 }
 
@@ -58,7 +68,7 @@ private struct AnimatedGIFView: UIViewRepresentable {
         let imageView = UIImageView()
         imageView.backgroundColor = .clear
         imageView.isUserInteractionEnabled = false
-        imageView.clipsToBounds = true
+        imageView.clipsToBounds = false
         imageView.contentMode = contentMode.uiViewContentMode
         return imageView
     }
@@ -274,6 +284,6 @@ private extension ContentMode {
         AppColor.dashboardBackground.ignoresSafeArea()
 
         PetAnimationView()
-            .frame(width: 50, height: 50)
+            .frame(width: 640, height: 360)
     }
 }

@@ -8,36 +8,13 @@
 import SwiftUI
 
 struct RewardCoinRegister: View {
-    @AppStorage("coinCount") private var coinCount = 0
-    
+    @AppStorage("coinCount") private var coinCount = 0    
     @State private var isRotating: Bool = false
     @State private var navigateToHatchView: Bool = false
     
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: [
-                    Color.secondary50Surface,
-                    Color.secondary300Main
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-            
-            Image("RewardBg")
-                .ignoresSafeArea()
-                .scaleEffect(1.1)
-                .rotationEffect(.degrees(isRotating ? 360 : 0))
-                .animation(
-                    .linear(duration: 3)
-                    .repeatForever(autoreverses: false),
-                    value: isRotating
-                )
-                .onAppear {
-                    isRotating = true
-                }
-            
+            RewardBg(scale: 1.1)
             VStack {
                 Text("Register Reward")
                     .font(AppFont.largeTitleBold)
