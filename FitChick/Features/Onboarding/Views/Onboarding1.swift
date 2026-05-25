@@ -31,9 +31,15 @@ struct Onboarding1: View {
                     .multilineTextAlignment(.center)
                     .font(AppFont.body)
                     .foregroundColor(.neutral600Subtext)
-                    PrimaryButton(title: "Next") {
-                        navigationPath.append(.onboarding2)
+                    VStack(spacing: 8) {
+                        PrimaryButton(title: "Next") {
+                            navigationPath.append(.onboarding2)
+                        }
+                        SecondaryButton(title: "Skip") {
+                            navigationPath.append(.skipOnboarding)
+                        }
                     }
+
                 }
                 .padding(.bottom, 64)
                 .ignoresSafeArea()
@@ -41,13 +47,25 @@ struct Onboarding1: View {
             .navigationDestination(for: OnboardingRoute.self) { route in
                 switch route {
                 case .onboarding2:
-                    Onboarding2 {
-                        navigationPath.append(.onboarding3)
-                    }
+                    Onboarding2(
+                        onNext: {
+                            navigationPath.append(.onboarding3)
+                        },
+                        onSkip: {
+                            navigationPath.append(.skipOnboarding)
+                        }
+                    )
                     .toolbar(.hidden, for: .navigationBar)
                 case .onboarding3:
-                    Onboarding3()
+                    Onboarding3(
+                        onSkip: {
+                            navigationPath.append(.skipOnboarding)
+                        }
+                    )
                     .toolbar(.hidden, for: .navigationBar)
+                case .skipOnboarding:
+                    SkipOnboardingView()
+                        .toolbar(.hidden, for: .navigationBar)
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -62,4 +80,5 @@ struct Onboarding1: View {
 private enum OnboardingRoute: Hashable {
     case onboarding2
     case onboarding3
+    case skipOnboarding
 }

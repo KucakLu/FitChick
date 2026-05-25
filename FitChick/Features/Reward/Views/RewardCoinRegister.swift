@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RewardCoinRegister: View {
     @AppStorage("coinCount") private var coinCount = 0
+    
     @State private var isRotating: Bool = false
     @State private var navigateToHatchView: Bool = false
     
@@ -16,7 +17,7 @@ struct RewardCoinRegister: View {
         ZStack {
             LinearGradient(
                 colors: [
-                    Color.secondary0Surface,
+                    Color.secondary50Surface,
                     Color.secondary300Main
                 ],
                 startPoint: .top,
@@ -36,6 +37,7 @@ struct RewardCoinRegister: View {
                 .onAppear {
                     isRotating = true
                 }
+            
             VStack {
                 Text("Register Reward")
                     .font(AppFont.largeTitleBold)
@@ -51,6 +53,7 @@ struct RewardCoinRegister: View {
                     }
                 }
                 .padding(.bottom, 120)
+                
                 Button {
                     coinCount += 10
                     navigateToHatchView = true
