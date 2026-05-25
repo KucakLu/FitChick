@@ -30,6 +30,7 @@ struct DismissButton: View {
 
     var body: some View {
         Button {
+            SoundManager.shared.playButtonSound()
             action()
         } label: {
             icon
