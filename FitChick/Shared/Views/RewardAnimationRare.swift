@@ -14,8 +14,8 @@ struct RewardAnimationRare: View {
         ZStack {
             LinearGradient(
                 colors: [
-                    Color.secondary0Surface,
-                    Color.secondary300Main
+                    Color.violet50Surface,
+                    Color.violet300Main
                 ],
                 startPoint: .top,
                 endPoint: .bottom
