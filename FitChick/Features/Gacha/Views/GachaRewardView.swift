@@ -54,12 +54,12 @@ struct GachaRewardView: View {
     private var chestImageView: some View {
         switch currentStep {
         case 1:
-            Image("ChestBox-2").resizable().aspectRatio(contentMode: .fit)
+            Image("ChestBox-2").resizable().aspectRatio(contentMode: .fit).transition(.opacity)
         case 2:
-            Image("ChestBox-3").resizable().aspectRatio(contentMode: .fit)
+            Image("ChestBox-3").resizable().aspectRatio(contentMode: .fit).transition(.opacity)
         case 3:
             ZStack(alignment: .center) {
-                Image("ChestBox-4").resizable().aspectRatio(contentMode: .fill)
+                Image("ChestBox-4").resizable().aspectRatio(contentMode: .fill).transition(.opacity)
                 
                 Image(getPreviewAssetName())
                     .resizable()
