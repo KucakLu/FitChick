@@ -35,7 +35,7 @@ struct DashboardView: View {
     
     private var petMessages: [String] {
         [
-            "Hallo my name is \(currentPetName)",
+            "Hello my name is \(currentPetName)",
             "Let’s walk with me!",
             "Keep going!",
             "You’re doing great!"

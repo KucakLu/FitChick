@@ -270,3 +270,34 @@ private extension DailyMissionActivityAttributes.ContentState {
         notificationBody: "Ayo, 500 langkah lagi untuk dapat 10 coin!"
     )
 }
+
+#Preview("Reward Claim Lock Screen", as: .content, using: DailyMissionActivityAttributes.stepPreview) {
+    DailyMissionLiveActivity()
+} contentStates: {
+    DailyMissionActivityAttributes.ContentState.completedPreview
+}
+
+#Preview("Reward Claim Dynamic Island Compact", as: .dynamicIsland(.compact), using: DailyMissionActivityAttributes.stepPreview) {
+    DailyMissionLiveActivity()
+} contentStates: {
+    DailyMissionActivityAttributes.ContentState.completedPreview
+}
+
+#Preview("Reward Claim Dynamic Island Expanded", as: .dynamicIsland(.expanded), using: DailyMissionActivityAttributes.stepPreview) {
+    DailyMissionLiveActivity()
+} contentStates: {
+    DailyMissionActivityAttributes.ContentState.completedPreview
+}
+
+#Preview("Reward Claim Dynamic Island Minimal", as: .dynamicIsland(.minimal), using: DailyMissionActivityAttributes.stepPreview) {
+    DailyMissionLiveActivity()
+} contentStates: {
+    DailyMissionActivityAttributes.ContentState.completedPreview
+}
+
+#Preview("Reward Claim Push Notification") {
+    DailyMissionPushNotificationPreview(
+        title: "Mission complete!",
+        notificationBody: "You earn 10 coin 🎉"
+    )
+}

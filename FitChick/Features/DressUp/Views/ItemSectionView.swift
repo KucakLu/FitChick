@@ -8,17 +8,26 @@
 import SwiftUI
 
 struct ItemSectionView: View {
-    @Environment(\.dismiss) private var dismiss
-    @AppStorage(EquippedPetItems.storageKey) private var equippedPetItemsStorage = EquippedPetItems.empty.encodedString
-    @State private var navigateToDashboard = false
+    @Binding var equippedItems: EquippedPetItems
+    @AppStorage(CollectionData.unlockedStorageKey) private var unlockedStorageString = "{}"
 
-    private let items: [CollectionItem] = CollectionData.items.filter { $0.isOwned }
+    private var unlockedAssetNames: [String] {
+        UnlockedItems(encodedString: unlockedStorageString).assetNames
+    }
+
+    private var items: [CollectionItem] {
+        CollectionData.items.filter { item in
+            item.isOwned || unlockedAssetNames.contains(item.svgAssetName)
+        }
+    }
     
     private let columns = [
         GridItem(.fixed(100), spacing: 16),
         GridItem(.fixed(100), spacing: 16),
         GridItem(.fixed(100), spacing: 16)
     ]
+
+    private let emptyMessage = "You haven’t collected anything yet. \n do your first gacha \n and see what you’ll get!"
     
     var body: some View {
         Rectangle()
@@ -26,59 +35,64 @@ struct ItemSectionView: View {
             .frame(maxWidth: .infinity)
             .frame(height: 380)
             .overlay(alignment: .top) {
-                VStack(spacing: 0) {
-                    Text("")
-                    ScrollView(.vertical, showsIndicators: false) {
-                        LazyVGrid(columns: columns, spacing: 20) {
-                            ForEach(items) { item in
-                                ItemGridButton(
-                                    svgAssetName: item.svgAssetName,
-                                    state: equippedPetItems.isEquipped(item) ? .selected : .normal
-                                ) {
-                                    toggle(item)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 24)
-                        .padding(.top, 4)
-                    }
+                if items.isEmpty {
+                    emptyState
+                } else {
+                    itemGrid
                 }
             }
-            .navigationBarHidden(true)
-            .navigationDestination(isPresented: $navigateToDashboard) {
-                DashboardView()
-            }
-            .onAppear(perform: removeUnavailableEquipment)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
         .ignoresSafeArea(.container, edges: .bottom)
     }
 
-    private var equippedPetItems: EquippedPetItems {
-        EquippedPetItems(encodedString: equippedPetItemsStorage)
-            .sanitizedForCurrentCatalog
+    private var emptyState: some View {
+        Text(emptyMessage)
+            .font(AppFont.bodyBold)
+            .kerning(AppFont.bodyBold.letterSpacing)
+            .lineSpacing(AppFont.bodyBold.lineSpacing)
+            .foregroundStyle(AppColor.secondary500Dark)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 40)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+    }
+
+    private var itemGrid: some View {
+        VStack(spacing: 0) {
+            Text("")
+            ScrollView(.vertical, showsIndicators: false) {
+                LazyVGrid(columns: columns, spacing: 20) {
+                    ForEach(items) { item in
+                        ItemGridButton(
+                            svgAssetName: item.svgAssetName,
+                            state: equippedItems.isEquipped(item) ? .selected : .normal
+                        ) {
+                            toggle(item)
+                        }
+                    }
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 4)
+            }
+        }
     }
 
     private func toggle(_ item: CollectionItem) {
-        var updatedItems = equippedPetItems
-        updatedItems.toggle(item)
-        equippedPetItemsStorage = updatedItems.encodedString
-    }
-
-    private func removeUnavailableEquipment() {
-        let sanitizedItems = equippedPetItems
-
-        guard sanitizedItems.encodedString != equippedPetItemsStorage else {
-            return
-        }
-
-        equippedPetItemsStorage = sanitizedItems.encodedString
+        equippedItems.toggle(item)
     }
 }
 
 #Preview {
-    ZStack {
-        AppColor.dashboardBackground.ignoresSafeArea()
-        
-        ItemSectionView()
+    ItemSectionPreview()
+}
+
+private struct ItemSectionPreview: View {
+    @State private var equippedItems = EquippedPetItems.empty
+
+    var body: some View {
+        ZStack {
+            AppColor.dashboardBackground.ignoresSafeArea()
+
+            ItemSectionView(equippedItems: $equippedItems)
+        }
     }
 }
