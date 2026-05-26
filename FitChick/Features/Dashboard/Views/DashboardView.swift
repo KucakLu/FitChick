@@ -26,6 +26,7 @@ struct DashboardView: View {
     
     @Query private var users: [UserAccount]
     @AppStorage("coinCount") private var coinCount = 0
+    @State private var dailyMissionCoordinator = DailyMissionCoordinator()
     @State private var petMessageIndex = 0
     @State private var stepCount = 0
     @State private var distanceCount = 0.0
@@ -132,12 +133,15 @@ struct DashboardView: View {
         } catch {
             print(error.localizedDescription)
         }
+
+        await updateDailyMissionProgress()
     }
 
     @MainActor
     private func observeStepCountUpdates() async {
         for await steps in healthStore.stepCountUpdates() {
             stepCount = Int(steps)
+            await updateDailyMissionProgress()
         }
     }
 
@@ -145,6 +149,7 @@ struct DashboardView: View {
     private func observeDistanceUpdates() async {
         for await distance in healthStore.walkingRunningDistanceUpdates() {
             distanceCount = distance
+            await updateDailyMissionProgress()
         }
     }
     
@@ -171,6 +176,32 @@ struct DashboardView: View {
         }
 
         return users.first { $0.userId == userId } ?? users.first
+    }
+
+    private var stepTargets: [Int] {
+        [
+            stepGoalFine,
+            stepGoalGood,
+            stepGoalExcellent
+        ]
+    }
+
+    private var distanceTargets: [Double] {
+        [
+            distanceGoalFine,
+            distanceGoalGood,
+            distanceGoalExcellent
+        ]
+    }
+
+    @MainActor
+    private func updateDailyMissionProgress() async {
+        await dailyMissionCoordinator.handleProgress(
+            steps: stepCount,
+            distance: distanceCount,
+            stepTargets: stepTargets,
+            distanceTargets: distanceTargets
+        )
     }
 }
 
