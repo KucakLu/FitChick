@@ -82,11 +82,11 @@ struct HatchView: View {
             ScrollViewReader { proxy in
                 ScrollView {
                     VStack {
-                        Text("Congratulation")
+                        Text("Congratulations !")
                             .font(AppFont.largeTitleBold)
                             .foregroundStyle(AppColor.secondary500Dark)
 
-                        Text("you get your pet")
+                        Text("you got your pet")
                             .font(AppFont.body)
                             .foregroundStyle(AppColor.secondary500Dark)
                             .padding(.bottom, 75)

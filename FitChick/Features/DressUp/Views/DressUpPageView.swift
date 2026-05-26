@@ -80,9 +80,7 @@ struct DressUpPageView: View {
                 Spacer()
                 DraftPetPreviewCard(equippedItems: draftEquippedItems)
 
-                DraftItemSectionView(
-                    draftEquippedItems: $draftEquippedItems
-                )
+                ItemSectionView(equippedItems: $draftEquippedItems)
             }
             .onAppear {
                 initDraft()
@@ -125,65 +123,6 @@ struct DraftPetPreviewCard: View {
                 .offset(y: contentYOffset)
         }
         .frame(width: cardSize.width, height: cardSize.height)
-    }
-}
-
-struct DraftItemSectionView: View {
-    @Binding var draftEquippedItems: EquippedPetItems
-    @AppStorage(CollectionData.unlockedStorageKey) private var unlockedStorageString = "{}"
-
-    private var items: [CollectionItem] {
-        _ = unlockedStorageString
-        return CollectionData.items.filter { CollectionData.isItemOwned($0) }
-    }
-
-    private let columns = [
-        GridItem(.fixed(100), spacing: 16),
-        GridItem(.fixed(100), spacing: 16),
-        GridItem(.fixed(100), spacing: 16)
-    ]
-
-    var body: some View {
-        Rectangle()
-            .fill(AppColor.secondary50Surface)
-            .frame(maxWidth: .infinity)
-            .frame(height: 380)
-            .overlay(alignment: .top) {
-                VStack(spacing: 0) {
-                    Text("")
-                    ScrollView(.vertical, showsIndicators: false) {
-                        LazyVGrid(columns: columns, spacing: 20) {
-                            ForEach(items) { item in
-                                let isUnlocked = CollectionData.isItemOwned(item)
-
-                                ItemGridButton(
-                                    svgAssetName: item.svgAssetName,
-                                    state: itemState(for: item, isUnlocked: isUnlocked)
-                                ) {
-                                    toggle(item)
-                                }
-                                .disabled(!isUnlocked)
-                            }
-                        }
-                        .padding(.horizontal, 24)
-                        .padding(.top, 4)
-                    }
-                }
-            }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-        .ignoresSafeArea(.container, edges: .bottom)
-    }
-
-    private func toggle(_ item: CollectionItem) {
-        draftEquippedItems.toggle(item)
-    }
-
-    private func itemState(for item: CollectionItem, isUnlocked: Bool) -> ItemState {
-        guard isUnlocked else {
-            return .locked
-        }
-
-        return draftEquippedItems.isEquipped(item) ? .selected : .normal
     }
 }
 

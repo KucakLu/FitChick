@@ -364,6 +364,7 @@ final class DailyMissionCoordinator {
         markTriggeredToday(rewardKey)
         let updatedCoinCount = defaults.integer(forKey: "coinCount") + mission.target.rewardCoin
         defaults.set(updatedCoinCount, forKey: "coinCount")
+        await sendRewardLocalNotification(for: mission.target)
         await showCompletedActivity(for: mission, currentValue: currentValue)
     }
 
@@ -548,6 +549,14 @@ final class DailyMissionCoordinator {
         } catch {
             print("Daily mission notification failed: \(error.localizedDescription)")
         }
+    }
+
+    private func sendRewardLocalNotification(for target: DailyMissionTarget) async {
+        await sendLocalNotification(
+            identifier: "dailyMission.reward.\(target.id).\(todayKey)",
+            title: "Mission complete!",
+            body: "You earn \(target.rewardCoin) coin 🎉"
+        )
     }
 
     private func nearGoalMessage(for target: DailyMissionTarget) -> String {
