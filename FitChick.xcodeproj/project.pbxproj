@@ -6,8 +6,37 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		4CDA00012FBE000100000001 /* DailyMissionWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4CDA00022FBE000100000001 /* DailyMissionWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4CDA000D2FBE000100000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4C47E5622FBC7182004BFBDB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4CDA00082FBE000100000001;
+			remoteInfo = DailyMissionWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		4CDA00072FBE000100000001 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				4CDA00012FBE000100000001 /* DailyMissionWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		4C47E56A2FBC7182004BFBDB /* FitChick.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitChick.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CDA00022FBE000100000001 /* DailyMissionWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DailyMissionWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -17,6 +46,13 @@
 				Info.plist,
 			);
 			target = 4C47E5692FBC7182004BFBDB /* FitChick */;
+		};
+		4CDA000E2FBE000100000001 /* Exceptions for "DailyMissionWidget" folder in "DailyMissionWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 4CDA00082FBE000100000001 /* DailyMissionWidgetExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -29,10 +65,25 @@
 			path = FitChick;
 			sourceTree = "<group>";
 		};
+		4CDA00032FBE000100000001 /* DailyMissionWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				4CDA000E2FBE000100000001 /* Exceptions for "DailyMissionWidget" folder in "DailyMissionWidgetExtension" target */,
+			);
+			path = DailyMissionWidget;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		4C47E5672FBC7182004BFBDB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4CDA00052FBE000100000001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -46,6 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				4C47E56C2FBC7182004BFBDB /* FitChick */,
+				4CDA00032FBE000100000001 /* DailyMissionWidget */,
 				4C47E56B2FBC7182004BFBDB /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,6 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				4C47E56A2FBC7182004BFBDB /* FitChick.app */,
+				4CDA00022FBE000100000001 /* DailyMissionWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -68,10 +121,12 @@
 				4C47E5662FBC7182004BFBDB /* Sources */,
 				4C47E5672FBC7182004BFBDB /* Frameworks */,
 				4C47E5682FBC7182004BFBDB /* Resources */,
+				4CDA00072FBE000100000001 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				4CDA000C2FBE000100000001 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				4C47E56C2FBC7182004BFBDB /* FitChick */,
@@ -82,6 +137,28 @@
 			productName = FitChick;
 			productReference = 4C47E56A2FBC7182004BFBDB /* FitChick.app */;
 			productType = "com.apple.product-type.application";
+		};
+		4CDA00082FBE000100000001 /* DailyMissionWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4CDA00092FBE000100000001 /* Build configuration list for PBXNativeTarget "DailyMissionWidgetExtension" */;
+			buildPhases = (
+				4CDA00042FBE000100000001 /* Sources */,
+				4CDA00052FBE000100000001 /* Frameworks */,
+				4CDA00062FBE000100000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				4CDA00032FBE000100000001 /* DailyMissionWidget */,
+			);
+			name = DailyMissionWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = DailyMissionWidgetExtension;
+			productReference = 4CDA00022FBE000100000001 /* DailyMissionWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -94,6 +171,9 @@
 				LastUpgradeCheck = 2650;
 				TargetAttributes = {
 					4C47E5692FBC7182004BFBDB = {
+						CreatedOnToolsVersion = 26.5;
+					};
+					4CDA00082FBE000100000001 = {
 						CreatedOnToolsVersion = 26.5;
 					};
 				};
@@ -113,12 +193,20 @@
 			projectRoot = "";
 			targets = (
 				4C47E5692FBC7182004BFBDB /* FitChick */,
+				4CDA00082FBE000100000001 /* DailyMissionWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		4C47E5682FBC7182004BFBDB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4CDA00062FBE000100000001 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -135,7 +223,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4CDA00042FBE000100000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4CDA000C2FBE000100000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4CDA00082FBE000100000001 /* DailyMissionWidgetExtension */;
+			targetProxy = 4CDA000D2FBE000100000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		4C47E5732FBC7183004BFBDB /* Debug */ = {
@@ -331,6 +434,70 @@
 			};
 			name = Release;
 		};
+		4CDA000A2FBE000100000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K39QVFTK2A;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DailyMissionWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Daily Mission";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.3;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hendrairawan.FitChick.dev.DailyMissionWidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4CDA000B2FBE000100000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K39QVFTK2A;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DailyMissionWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Daily Mission";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.3;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hendrairawan.FitChick.dev.DailyMissionWidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -348,6 +515,15 @@
 			buildConfigurations = (
 				4C47E5762FBC7183004BFBDB /* Debug */,
 				4C47E5772FBC7183004BFBDB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4CDA00092FBE000100000001 /* Build configuration list for PBXNativeTarget "DailyMissionWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4CDA000A2FBE000100000001 /* Debug */,
+				4CDA000B2FBE000100000001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

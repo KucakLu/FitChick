@@ -10,6 +10,8 @@ import SwiftData
 
 @main
 struct FitChickApp: App {
+    @UIApplicationDelegateAdaptor(FitChickAppDelegate.self) private var appDelegate
+
     var body: some Scene {
         WindowGroup {
             Onboarding()
