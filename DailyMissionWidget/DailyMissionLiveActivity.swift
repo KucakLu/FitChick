@@ -126,6 +126,34 @@ struct ChickBadge: View {
     }
 }
 
+struct DailyMissionPushNotificationPreview: View {
+    let title: String
+    let notificationBody: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            ChickBadge(size: 36)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.system(.subheadline, design: .rounded, weight: .bold))
+
+                Text(notificationBody)
+                    .font(.system(.caption, design: .rounded, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+            }
+
+            Spacer(minLength: 8)
+        }
+        .padding(14)
+        .frame(maxWidth: 360)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .padding()
+        .background(Color.black)
+    }
+}
+
 private extension DailyMissionActivityAttributes.ContentState {
     func remainingText(for kind: DailyMissionKind) -> String {
         kind.formattedValue(remainingValue)
@@ -161,4 +189,84 @@ private extension DailyMissionActivityAttributes.ContentState {
             return "\(kind.formattedValue(remainingValue))km"
         }
     }
+}
+
+private extension DailyMissionActivityAttributes {
+    static var stepPreview: DailyMissionActivityAttributes {
+        DailyMissionActivityAttributes(
+            missionID: "preview-step-8000",
+            kind: .step,
+            targetValue: 8_000,
+            rewardCoin: 10,
+            startedAt: Date(),
+            duration: 10 * 60
+        )
+    }
+}
+
+private extension DailyMissionActivityAttributes.ContentState {
+    static var kickoffPreview: DailyMissionActivityAttributes.ContentState {
+        DailyMissionActivityAttributes.ContentState(
+            currentValue: 4_250,
+            remainingValue: 0,
+            message: "Nice! Kamu sudah mulai jalan.",
+            phase: .kickoff,
+            updatedAt: Date()
+        )
+    }
+
+    static var nearGoalPreview: DailyMissionActivityAttributes.ContentState {
+        DailyMissionActivityAttributes.ContentState(
+            currentValue: 7_500,
+            remainingValue: 500,
+            message: "Ayo, 500 langkah lagi untuk dapat 10 coin!",
+            phase: .nearGoal,
+            updatedAt: Date()
+        )
+    }
+
+    static var completedPreview: DailyMissionActivityAttributes.ContentState {
+        DailyMissionActivityAttributes.ContentState(
+            currentValue: 8_000,
+            remainingValue: 0,
+            message: "You earn 10 coin",
+            phase: .completed,
+            updatedAt: Date()
+        )
+    }
+}
+
+#Preview("Lock Screen Live Activity", as: .content, using: DailyMissionActivityAttributes.stepPreview) {
+    DailyMissionLiveActivity()
+} contentStates: {
+    DailyMissionActivityAttributes.ContentState.nearGoalPreview
+    DailyMissionActivityAttributes.ContentState.completedPreview
+}
+
+#Preview("Dynamic Island Compact", as: .dynamicIsland(.compact), using: DailyMissionActivityAttributes.stepPreview) {
+    DailyMissionLiveActivity()
+} contentStates: {
+    DailyMissionActivityAttributes.ContentState.nearGoalPreview
+    DailyMissionActivityAttributes.ContentState.kickoffPreview
+    DailyMissionActivityAttributes.ContentState.completedPreview
+}
+
+#Preview("Dynamic Island Expanded", as: .dynamicIsland(.expanded), using: DailyMissionActivityAttributes.stepPreview) {
+    DailyMissionLiveActivity()
+} contentStates: {
+    DailyMissionActivityAttributes.ContentState.nearGoalPreview
+    DailyMissionActivityAttributes.ContentState.completedPreview
+}
+
+#Preview("Dynamic Island Minimal", as: .dynamicIsland(.minimal), using: DailyMissionActivityAttributes.stepPreview) {
+    DailyMissionLiveActivity()
+} contentStates: {
+    DailyMissionActivityAttributes.ContentState.nearGoalPreview
+}
+
+#Preview("Push Notification") {
+    DailyMissionPushNotificationPreview(
+        title: "Daily Mission",
+        notificationBody: "Ayo, 500 langkah lagi untuk dapat 10 coin!"
+    )
 }
