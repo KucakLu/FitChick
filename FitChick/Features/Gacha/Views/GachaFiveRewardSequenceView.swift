@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct GachaFiveRewardSequenceView: View {
+    @EnvironmentObject private var router: AppRouter
     let items: [CollectionItem]
 
     @State private var currentIndex = 0
-    @State private var navigateToDashboard = false
 
     var body: some View {
         Group {
@@ -19,11 +19,11 @@ struct GachaFiveRewardSequenceView: View {
                 currentRewardView(for: currentItem)
                     .id(currentItem.svgAssetName)
             } else {
-                DashboardView()
+                Color.clear
+                    .onAppear {
+                        router.showDashboard()
+                    }
             }
-        }
-        .fullScreenCover(isPresented: $navigateToDashboard) {
-            DashboardView()
         }
     }
 
@@ -54,11 +54,13 @@ struct GachaFiveRewardSequenceView: View {
                 currentIndex += 1
             }
         } else {
-            navigateToDashboard = true
+            PerformanceProbe.event("RouteRewardFiveToDashboard")
+            router.showDashboard()
         }
     }
 }
 
 #Preview {
     GachaFiveRewardSequenceView(items: Array(CollectionData.items.prefix(5)))
+        .environmentObject(AppRouter())
 }

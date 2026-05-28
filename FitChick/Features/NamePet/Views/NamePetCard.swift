@@ -10,12 +10,12 @@ import SwiftData
 
 struct NamePetCard: View {
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var router: AppRouter
     @Query private var users: [UserAccount]
 
     private let autoFocus: Bool
 
     @State private var petName = ""
-    @State private var navigateToDashboard = false
     @FocusState private var isPetNameFocused: Bool
 
     init(autoFocus: Bool = true) {
@@ -68,31 +68,31 @@ struct NamePetCard: View {
             RoundedRectangle(cornerRadius: 14)
                 .fill(AppColor.secondary0Surface)
         )
-        .fullScreenCover(isPresented: $navigateToDashboard) {
-            DashboardView()
-        }
     }
 
     private func savePetName() {
-        let savedPetName = petName.trimmingCharacters(in: .whitespacesAndNewlines)
+        PerformanceProbe.measure("NamePetSave") {
+            let savedPetName = petName.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        guard !savedPetName.isEmpty else { return }
+            guard !savedPetName.isEmpty else { return }
 
-        if let currentUser = currentUser {
-            currentUser.petName = savedPetName
-        } else {
-            let userId = KeychainManager.shared.retrieve(key: "appleUserId") ?? "localUser"
-            let newUser = UserAccount(userId: userId, petName: savedPetName)
-            modelContext.insert(newUser)
-        }
+            if let currentUser = currentUser {
+                currentUser.petName = savedPetName
+            } else {
+                let userId = KeychainManager.shared.retrieve(key: "appleUserId") ?? "localUser"
+                let newUser = UserAccount(userId: userId, petName: savedPetName)
+                modelContext.insert(newUser)
+            }
 
-        DispatchQueue.main.async { self.isPetNameFocused = false }
+            DispatchQueue.main.async { self.isPetNameFocused = false }
 
-        do {
-            try modelContext.save()
-            navigateToDashboard = true
-        } catch {
-            print("Failed to save pet name: \(error.localizedDescription)")
+            do {
+                try modelContext.save()
+                PerformanceProbe.event("RouteNamePetToDashboard")
+                router.showDashboard()
+            } catch {
+                print("Failed to save pet name: \(error.localizedDescription)")
+            }
         }
     }
 
@@ -118,4 +118,5 @@ struct NamePetCard: View {
         NamePetCard()
     }
     .modelContainer(container)
+    .environmentObject(AppRouter())
 }

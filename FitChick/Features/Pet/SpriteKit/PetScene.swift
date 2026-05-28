@@ -38,6 +38,7 @@ final class PetScene: SKScene {
     override func didMove(to view: SKView) {
         super.didMove(to: view)
 
+        PerformanceProbe.event("PetSceneDidMove")
         view.allowsTransparency = true
         view.backgroundColor = .clear
         view.ignoresSiblingOrder = true
@@ -63,7 +64,9 @@ final class PetScene: SKScene {
         }
 
         self.equipment = equipment
-        chickNode.updateEquipment(equipment)
+        PerformanceProbe.measure("PetSceneUpdateEquipment") {
+            chickNode.updateEquipment(equipment)
+        }
     }
 
     private func configureScene() {
@@ -120,8 +123,13 @@ struct PetSceneView: View {
         .aspectRatio(PetScene.referenceAspectRatio, contentMode: .fit)
         .background(Color.clear)
         .onAppear {
+            PerformanceProbe.event("PetSceneViewAppear")
             scene.updateEquipment(equipment)
             scene.setAnimation(isPlaying: isPlaying)
+        }
+        .onDisappear {
+            PerformanceProbe.event("PetSceneViewDisappear")
+            scene.setAnimation(isPlaying: false)
         }
         .onChange(of: equipment) { _, newValue in
             scene.updateEquipment(newValue)

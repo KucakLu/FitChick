@@ -44,24 +44,26 @@ class HealthStore {
         let startOfDay = Calendar.current.startOfDay(for: Date()) // todays date
         let predicate = HKQuery.predicateForSamples(withStart: startOfDay, end: Date(), options: .strictStartDate)
 
-        return try await withCheckedThrowingContinuation { continuation in
-            let query = HKStatisticsQuery(quantityType: stepCountType, quantitySamplePredicate: predicate, options: .cumulativeSum) {
-                _, result, error in
-                if let error = error as? HKError, error.code == .errorNoData {
-                    continuation.resume(returning: 0)
-                    return
-                }
-                
-                if let error = error {
-                    continuation.resume(throwing: error)
-                    return
+        return try await PerformanceProbe.measure("HealthFetchStepCount") {
+            try await withCheckedThrowingContinuation { continuation in
+                let query = HKStatisticsQuery(quantityType: stepCountType, quantitySamplePredicate: predicate, options: .cumulativeSum) {
+                    _, result, error in
+                    if let error = error as? HKError, error.code == .errorNoData {
+                        continuation.resume(returning: 0)
+                        return
+                    }
+
+                    if let error = error {
+                        continuation.resume(throwing: error)
+                        return
+                    }
+
+                    let stepCount = result?.sumQuantity()?.doubleValue(for: .count()) ?? 0
+                    continuation.resume(returning: stepCount)
                 }
 
-                let stepCount = result?.sumQuantity()?.doubleValue(for: .count()) ?? 0
-                continuation.resume(returning: stepCount)
+                healthStore.execute(query)
             }
-
-            healthStore.execute(query)
         }
     }
 
@@ -82,24 +84,26 @@ class HealthStore {
         let startOfDay = Calendar.current.startOfDay(for: Date())
         let predicate = HKQuery.predicateForSamples(withStart: startOfDay, end: Date(), options: .strictStartDate)
 
-        return try await withCheckedThrowingContinuation { continuation in
-            let query = HKStatisticsQuery(quantityType: distanceType, quantitySamplePredicate: predicate, options: .cumulativeSum) {
-                _, result, error in
-                if let error = error as? HKError, error.code == .errorNoData {
-                    continuation.resume(returning: 0)
-                    return
+        return try await PerformanceProbe.measure("HealthFetchDistance") {
+            try await withCheckedThrowingContinuation { continuation in
+                let query = HKStatisticsQuery(quantityType: distanceType, quantitySamplePredicate: predicate, options: .cumulativeSum) {
+                    _, result, error in
+                    if let error = error as? HKError, error.code == .errorNoData {
+                        continuation.resume(returning: 0)
+                        return
+                    }
+
+                    if let error = error {
+                        continuation.resume(throwing: error)
+                        return
+                    }
+
+                    let distance = result?.sumQuantity()?.doubleValue(for: .meterUnit(with: .kilo)) ?? 0
+                    continuation.resume(returning: distance)
                 }
 
-                if let error = error {
-                    continuation.resume(throwing: error)
-                    return
-                }
-
-                let distance = result?.sumQuantity()?.doubleValue(for: .meterUnit(with: .kilo)) ?? 0
-                continuation.resume(returning: distance)
+                healthStore.execute(query)
             }
-
-            healthStore.execute(query)
         }
     }
 
@@ -112,7 +116,7 @@ class HealthStore {
     }
 
     private func dailyQuantityUpdates(for quantityType: HKQuantityType, unit: HKUnit) -> AsyncStream<Double> {
-        AsyncStream { continuation in
+        AsyncStream(Double.self, bufferingPolicy: .bufferingNewest(1)) { continuation in
             var interval = DateComponents()
             interval.day = 1
 
@@ -130,6 +134,8 @@ class HealthStore {
                     return
                 }
 
+                PerformanceProbe.event("HealthQuantityInitialResult")
+
                 guard let collection else {
                     continuation.yield(0)
                     return
@@ -143,6 +149,8 @@ class HealthStore {
                     print(error.localizedDescription)
                     return
                 }
+
+                PerformanceProbe.event("HealthQuantityUpdate")
 
                 if let collection {
                     continuation.yield(Self.todayQuantityValue(from: collection, unit: unit))
@@ -160,6 +168,7 @@ class HealthStore {
             healthStore.execute(query)
 
             continuation.onTermination = { [weak self] _ in
+                PerformanceProbe.event("HealthQuantityTerminated")
                 self?.healthStore.stop(query)
             }
         }

@@ -52,7 +52,7 @@ struct EquippedPetItems: Codable, Equatable {
         head?.assetName == "black_hat"
     }
 
-    var sanitizedForCurrentCatalog: EquippedPetItems {
+    func sanitizedForCurrentCatalog(unlockedItems: UnlockedItems) -> EquippedPetItems {
         var sanitizedItems = self
 
         ItemCategory.allCases.forEach { category in
@@ -60,7 +60,7 @@ struct EquippedPetItems: Codable, Equatable {
                 return
             }
 
-            if CollectionData.isOwnedEquipment(item) == false {
+            if CollectionData.isOwnedEquipment(item, unlockedItems: unlockedItems) == false {
                 sanitizedItems[category] = nil
             }
         }
@@ -209,12 +209,23 @@ struct CollectionData {
         let jsonString = UserDefaults.standard.string(forKey: unlockedStorageKey) ?? "{}"
         let unlockedContainer = UnlockedItems(encodedString: jsonString)
         
-        return unlockedContainer.assetNames.contains(item.svgAssetName)
+        return isItemOwned(item, unlockedItems: unlockedContainer)
+    }
+
+    static func isItemOwned(_ item: CollectionItem, unlockedItems: UnlockedItems) -> Bool {
+        item.isOwned || unlockedItems.assetNames.contains(item.svgAssetName)
     }
 
     static func isOwnedEquipment(_ equipment: EquippedPetItem) -> Bool {
+        let jsonString = UserDefaults.standard.string(forKey: unlockedStorageKey) ?? "{}"
+        let unlockedContainer = UnlockedItems(encodedString: jsonString)
+
+        return isOwnedEquipment(equipment, unlockedItems: unlockedContainer)
+    }
+
+    static func isOwnedEquipment(_ equipment: EquippedPetItem, unlockedItems: UnlockedItems) -> Bool {
         return items.contains { item in
-            let currentOwnership = isItemOwned(item)
+            let currentOwnership = isItemOwned(item, unlockedItems: unlockedItems)
             
             return currentOwnership
                 && item.category == equipment.category

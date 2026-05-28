@@ -82,6 +82,7 @@ struct Onboarding3: View {
         guard shouldNavigateToConnectHealth else { return }
 
         shouldNavigateToConnectHealth = false
+        PerformanceProbe.event("RouteOnboarding3ToConnectHealth")
         isShowingConnectHealth = true
     }
 }

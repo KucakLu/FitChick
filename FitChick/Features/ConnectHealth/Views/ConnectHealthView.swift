@@ -54,19 +54,22 @@ struct ConnectHealthView: View {
     
     @MainActor
     func requestHealthKitAccess() async {
-        do {
-            try await healthStore.requestAuthorization()
-            
+        await PerformanceProbe.measure("ConnectHealthRequestAccess") {
             do {
-                stepCount = try await healthStore.fetchStepCount()
+                try await healthStore.requestAuthorization()
+
+                do {
+                    stepCount = try await healthStore.fetchStepCount()
+                } catch {
+                    stepCount = 0
+                    print(error.localizedDescription)
+                }
+
+                PerformanceProbe.event("RouteConnectHealthToReward")
+                navigateToRewardCoinRegister = true
             } catch {
-                stepCount = 0
                 print(error.localizedDescription)
             }
-            
-            navigateToRewardCoinRegister = true
-        } catch {
-            print(error.localizedDescription)
         }
     }
 }

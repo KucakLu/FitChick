@@ -33,9 +33,11 @@ struct Onboarding1: View {
                     .foregroundColor(.neutral600Subtext)
                     VStack(spacing: 8) {
                         PrimaryButton(title: "Next") {
+                            PerformanceProbe.event("RouteOnboarding1ToOnboarding2")
                             navigationPath.append(.onboarding2)
                         }
                         SecondaryButton(title: "Skip") {
+                            PerformanceProbe.event("RouteOnboarding1ToSkip")
                             navigationPath.append(.skipOnboarding)
                         }
                     }
@@ -49,9 +51,11 @@ struct Onboarding1: View {
                 case .onboarding2:
                     Onboarding2(
                         onNext: {
+                            PerformanceProbe.event("RouteOnboarding2ToOnboarding3")
                             navigationPath.append(.onboarding3)
                         },
                         onSkip: {
+                            PerformanceProbe.event("RouteOnboarding2ToSkip")
                             navigationPath.append(.skipOnboarding)
                         }
                     )
@@ -59,6 +63,7 @@ struct Onboarding1: View {
                 case .onboarding3:
                     Onboarding3(
                         onSkip: {
+                            PerformanceProbe.event("RouteOnboarding3ToSkip")
                             navigationPath.append(.skipOnboarding)
                         }
                     )

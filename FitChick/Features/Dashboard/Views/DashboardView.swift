@@ -9,13 +9,14 @@ import SwiftUI
 import SwiftData
 
 struct DashboardView: View {
+    @EnvironmentObject private var appState: AppStateStore
     
-    
+    private let stepGoalMin = 4000
     private let stepGoalFine = 8000
     private let stepGoalGood = 10000
     private let stepGoalExcellent = 12000
 
-    
+    private let distanceGoalMin = 3.0
     private let distanceGoalFine = 6.0
     private let distanceGoalGood = 8.0
     private let distanceGoalExcellent = 10.0
@@ -25,20 +26,32 @@ struct DashboardView: View {
     private let healthStore = HealthStore()
     
     @Query private var users: [UserAccount]
-    @AppStorage("coinCount") private var coinCount = 0
     @State private var dailyMissionCoordinator = DailyMissionCoordinator()
     @State private var petMessageIndex = 0
     @State private var stepCount = 0
     @State private var distanceCount = 0.0
     @State private var navigateToGachaPage = false
     @State private var navigateToDressUpPage = false
+    @State private var pendingDailyMissionUpdate: Task<Void, Never>?
     
     private var petMessages: [String] {
         [
             "Hello my name is \(currentPetName)",
             "Let’s walk with me!",
-            "Keep going!",
-            "You’re doing great!"
+            "You’re doing great!",
+            "Ready to move with me?",
+            "Let’s start our little adventure!",
+            "Your walking buddy is here!",
+            "Cluck cluck! I’m ready!",
+            "Today feels like a good day to move!",
+            "Let’s make today healthier!",
+            "Just a short walk?",
+            "Come on, let’s stretch a little!",
+            "Your body needs a tiny boost!",
+            "Let’s move before we get sleepy!",
+            "I believe you can start small!",
+            "Five minutes is enough to begin!",
+            "Let’s shake off the lazy mood!",
         ]
     }
 
@@ -67,11 +80,13 @@ struct DashboardView: View {
 
                 VStack(spacing: 0) {
                     DashboardHeaderView(
-                        coinCount: coinCount,
+                        coinCount: appState.coinCount,
                         onBoxTapped: {
+                            PerformanceProbe.event("RouteDashboardToGacha")
                             navigateToGachaPage = true
                         },
                         onClosetTapped: {
+                            PerformanceProbe.event("RouteDashboardToDressUp")
                             navigateToDressUpPage = true
                         }
                     )
@@ -83,10 +98,12 @@ struct DashboardView: View {
                     
                     DailyProgressSectionView(
                         stepCount: stepCount,
+                        stepGoalMin: stepGoalMin,
                         stepGoalFine: stepGoalFine,
                         stepGoalGood: stepGoalGood,
                         stepGoalExcellent: stepGoalExcellent,
                         distanceCount: distanceCount,
+                        distanceGoalMin: distanceGoalMin,
                         distanceGoalFine: distanceGoalFine,
                         distanceGoalGood: distanceGoalGood,
                         distanceGoalExcellent: distanceGoalExcellent
@@ -103,19 +120,35 @@ struct DashboardView: View {
                 DressUpPageView()
                     .toolbar(.hidden, for: .navigationBar)
             }
+            .onAppear {
+                PerformanceProbe.event("DashboardAppear")
+            }
+            .onDisappear {
+                PerformanceProbe.event("DashboardDisappear")
+                pendingDailyMissionUpdate?.cancel()
+                pendingDailyMissionUpdate = nil
+            }
             
         }
         .task {
-            await fetchTodayActivityProgress()
+            await PerformanceProbe.measure("DashboardFetchTodayProgress") {
+                await fetchTodayActivityProgress()
+            }
         }
         .task {
-            await observeStepCountUpdates()
+            await PerformanceProbe.measure("DashboardObserveStepUpdates") {
+                await observeStepCountUpdates()
+            }
         }
         .task {
-            await observeDistanceUpdates()
+            await PerformanceProbe.measure("DashboardObserveDistanceUpdates") {
+                await observeDistanceUpdates()
+            }
         }
         .task {
-            await rotatePetMessages()
+            await PerformanceProbe.measure("DashboardRotatePetMessages") {
+                await rotatePetMessages()
+            }
         }
     }
     
@@ -140,16 +173,18 @@ struct DashboardView: View {
     @MainActor
     private func observeStepCountUpdates() async {
         for await steps in healthStore.stepCountUpdates() {
+            PerformanceProbe.event("HealthStepUpdate")
             stepCount = Int(steps)
-            await updateDailyMissionProgress()
+            scheduleDailyMissionProgressUpdate()
         }
     }
 
     @MainActor
     private func observeDistanceUpdates() async {
         for await distance in healthStore.walkingRunningDistanceUpdates() {
+            PerformanceProbe.event("HealthDistanceUpdate")
             distanceCount = distance
-            await updateDailyMissionProgress()
+            scheduleDailyMissionProgressUpdate()
         }
     }
     
@@ -196,12 +231,28 @@ struct DashboardView: View {
 
     @MainActor
     private func updateDailyMissionProgress() async {
-        await dailyMissionCoordinator.handleProgress(
-            steps: stepCount,
-            distance: distanceCount,
-            stepTargets: stepTargets,
-            distanceTargets: distanceTargets
-        )
+        await PerformanceProbe.measure("DailyMissionHandleProgress") {
+            await dailyMissionCoordinator.handleProgress(
+                steps: stepCount,
+                distance: distanceCount,
+                stepTargets: stepTargets,
+                distanceTargets: distanceTargets
+            )
+        }
+    }
+
+    @MainActor
+    private func scheduleDailyMissionProgressUpdate() {
+        pendingDailyMissionUpdate?.cancel()
+        pendingDailyMissionUpdate = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 350_000_000)
+
+            guard !Task.isCancelled else {
+                return
+            }
+
+            await updateDailyMissionProgress()
+        }
     }
 }
 
@@ -213,4 +264,5 @@ struct DashboardView: View {
 
     DashboardView()
         .modelContainer(container)
+        .environmentObject(AppStateStore.preview())
 }

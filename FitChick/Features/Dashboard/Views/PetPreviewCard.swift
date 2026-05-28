@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct PetPreviewCard: View {
+    @EnvironmentObject private var appState: AppStateStore
     private let cardSize = CGSize(width: 360, height: 254)
     private let petSceneSize = CGSize(width: 250, height: 305)
     private let shadowWidth: CGFloat = 300
     private let contentYOffset: CGFloat = -2
-    @AppStorage(EquippedPetItems.storageKey) private var equippedPetItemsStorage = EquippedPetItems.empty.encodedString
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -26,7 +26,7 @@ struct PetPreviewCard: View {
         }
         .frame(width: cardSize.width, height: cardSize.height)
         .onAppear(perform: removeUnavailableEquipment)
-        .onChange(of: equippedPetItemsStorage) { _, _ in
+        .onChange(of: appState.equippedPetItems) { _, _ in
             removeUnavailableEquipment()
         }
     }
@@ -39,21 +39,23 @@ struct PetPreviewCard: View {
     }
 
     private var equippedPetItems: EquippedPetItems {
-        EquippedPetItems(encodedString: equippedPetItemsStorage)
-            .sanitizedForCurrentCatalog
+        appState.equippedPetItems.sanitizedForCurrentCatalog(
+            unlockedItems: appState.unlockedItems
+        )
     }
 
     private func removeUnavailableEquipment() {
         let sanitizedItems = equippedPetItems
 
-        guard sanitizedItems.encodedString != equippedPetItemsStorage else {
+        guard sanitizedItems != appState.equippedPetItems else {
             return
         }
 
-        equippedPetItemsStorage = sanitizedItems.encodedString
+        appState.setEquippedPetItems(sanitizedItems)
     }
 }
 
 #Preview {
     PetPreviewCard()
+        .environmentObject(AppStateStore.preview())
 }

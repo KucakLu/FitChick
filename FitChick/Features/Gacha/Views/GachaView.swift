@@ -21,11 +21,7 @@ struct GachaView: View {
     }
 
     @Environment(\.dismiss) private var dismiss
-    
-    @AppStorage("coinCount") private var coinCount = 0
-    @AppStorage("totalGachaCount") private var totalGachaCount = 0
-    
-    @AppStorage(CollectionData.unlockedStorageKey) private var unlockedStorageString = "{}"
+    @EnvironmentObject private var appState: AppStateStore
         
     @State private var showRewardView: Bool = false
     @State private var selectedResultType: GachaResultType = .singleNormal(CollectionData.items[0])
@@ -34,8 +30,10 @@ struct GachaView: View {
     @State private var showPreviewItems = false
     @State private var showCollectPrompt = false
     @State private var arePreviewItemsRotating = false
+    @State private var gachaOpeningTask: Task<Void, Never>?
     
     var body: some View {
+        let coinCount = appState.coinCount
         let isGachaAnimationActive = gachaOpeningState != .idle
         let isGachaSoldOut = !hasAvailableGachaItem
         let isButton1xDisabled = coinCount < 10 || showRewardView || isGachaAnimationActive || isGachaSoldOut
@@ -55,7 +53,10 @@ struct GachaView: View {
                     }
                     .padding(.horizontal, 16).padding(.vertical, 6)
                     Spacer().frame(width: 50)
-                    IconButton(icon: Image("collectibleIcon")) { navigateToCollectionPage = true }
+                    IconButton(icon: Image("collectibleIcon")) {
+                        PerformanceProbe.event("RouteGachaToCollection")
+                        navigateToCollectionPage = true
+                    }
                     Spacer()
                 }
                 .opacity(isGachaAnimationActive ? 0 : 1)
@@ -78,11 +79,13 @@ struct GachaView: View {
                 } else if !isGachaAnimationActive {
                     HStack(spacing: 24) {
                         ClaimRewardButton(coinAmount: 10, claimText: "1x", isDisabled: isButton1xDisabled) {
+                            PerformanceProbe.event("GachaExecuteSingle")
                             executeGacha(cost: 10, drawCount: 1)
                         }
                         .allowsHitTesting(!isButton1xDisabled)
 
                         ClaimRewardButton(coinAmount: 50, claimText: "5x", isDisabled: isButton5xDisabled) {
+                            PerformanceProbe.event("GachaExecuteFive")
                             executeGacha(cost: 50, drawCount: 5)
                         }
                         .allowsHitTesting(!isButton5xDisabled)
@@ -106,6 +109,10 @@ struct GachaView: View {
         .contentShape(Rectangle())
         .onTapGesture {
             collectGachaRewardIfReady()
+        }
+        .onDisappear {
+            gachaOpeningTask?.cancel()
+            gachaOpeningTask = nil
         }
     }
     
@@ -194,7 +201,7 @@ struct GachaView: View {
     }
 
     private var hasAvailableGachaItem: Bool {
-        let unlockedList = UnlockedItems(encodedString: unlockedStorageString).assetNames
+        let unlockedList = appState.unlockedItems.assetNames
 
         return CollectionData.items.contains { item in
             !isItemOwned(item, unlockedList: unlockedList)
@@ -216,7 +223,7 @@ struct GachaView: View {
     }
 
     private func executeGacha(cost: Int, drawCount: Int) {
-        guard coinCount >= cost, gachaOpeningState == .idle, hasAvailableGachaItem else {
+        guard appState.coinCount >= cost, gachaOpeningState == .idle, hasAvailableGachaItem else {
             return
         }
 
@@ -228,35 +235,33 @@ struct GachaView: View {
     }
 
     private func executeSingleGacha(cost: Int) {
-        coinCount -= cost
-
-        var unlockedContainer = UnlockedItems(encodedString: unlockedStorageString)
-        totalGachaCount += 1
-        let isRare = totalGachaCount % 4 == 0
+        var unlockedContainer = appState.unlockedItems
+        let nextTotalGachaCount = appState.totalGachaCount + 1
+        let isRare = nextTotalGachaCount % 4 == 0
 
         guard let drawnItem = rollUnownedItem(unlockedList: unlockedContainer.assetNames, preferRare: isRare) else {
-            coinCount += cost
-            totalGachaCount -= 1
             return
         }
 
         unlock(drawnItem, in: &unlockedContainer)
         selectedResultType = drawnItem.rarity == .rare ? .singleRare(drawnItem) : .singleNormal(drawnItem)
-        unlockedStorageString = unlockedContainer.encodedString
+        appState.updateGachaState(
+            coinCount: appState.coinCount - cost,
+            totalGachaCount: nextTotalGachaCount,
+            unlockedItems: unlockedContainer
+        )
 
         startGachaOpeningAnimation()
     }
 
     private func executeFiveGacha(cost: Int) {
-        coinCount -= cost
-
-        var unlockedContainer = UnlockedItems(encodedString: unlockedStorageString)
+        var unlockedContainer = appState.unlockedItems
         var gachaResults: [CollectionItem] = []
-        let originalTotalGachaCount = totalGachaCount
+        var nextTotalGachaCount = appState.totalGachaCount
 
         for _ in 1...5 {
-            totalGachaCount += 1
-            let isRare = totalGachaCount % 4 == 0
+            nextTotalGachaCount += 1
+            let isRare = nextTotalGachaCount % 4 == 0
 
             if let drawnItem = rollUnownedItem(unlockedList: unlockedContainer.assetNames, preferRare: isRare) {
                 gachaResults.append(drawnItem)
@@ -265,17 +270,20 @@ struct GachaView: View {
         }
 
         guard !gachaResults.isEmpty else {
-            coinCount += cost
-            totalGachaCount = originalTotalGachaCount
             return
         }
 
         selectedResultType = .fiveDraw(gachaResults)
-        unlockedStorageString = unlockedContainer.encodedString
+        appState.updateGachaState(
+            coinCount: appState.coinCount - cost,
+            totalGachaCount: nextTotalGachaCount,
+            unlockedItems: unlockedContainer
+        )
         startGachaOpeningAnimation()
     }
 
     private func startGachaOpeningAnimation() {
+        gachaOpeningTask?.cancel()
         arePreviewItemsRotating = false
         showPreviewItems = false
         showCollectPrompt = false
@@ -284,18 +292,28 @@ struct GachaView: View {
             gachaOpeningState = .shaking
         }
 
-        Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 1_250_000_000)
+        gachaOpeningTask = Task { @MainActor in
+            await PerformanceProbe.measure("GachaOpeningAnimation") {
+                try? await Task.sleep(nanoseconds: 1_250_000_000)
 
-            withAnimation(.spring(response: 0.42, dampingFraction: 0.82)) {
-                gachaOpeningState = .opened
-            }
+                guard !Task.isCancelled else {
+                    return
+                }
 
-            try? await Task.sleep(nanoseconds: 420_000_000)
+                withAnimation(.spring(response: 0.42, dampingFraction: 0.82)) {
+                    gachaOpeningState = .opened
+                }
 
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.82)) {
-                showPreviewItems = true
-                showCollectPrompt = true
+                try? await Task.sleep(nanoseconds: 420_000_000)
+
+                guard !Task.isCancelled else {
+                    return
+                }
+
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.82)) {
+                    showPreviewItems = true
+                    showCollectPrompt = true
+                }
             }
         }
     }
@@ -306,6 +324,7 @@ struct GachaView: View {
         }
 
         SoundManager.shared.playButtonSound()
+        PerformanceProbe.event("RouteGachaToReward")
         showRewardView = true
     }
 
@@ -334,8 +353,7 @@ struct GachaView: View {
     }
 }
 #Preview {
-    let _ = UserDefaults.standard.set(100, forKey: "coinCount")
-    let _ = UserDefaults.standard.set(0, forKey: "totalGachaCount")
-    
     return GachaView()
+        .environmentObject(AppRouter())
+        .environmentObject(AppStateStore.preview(coinCount: 100))
 }

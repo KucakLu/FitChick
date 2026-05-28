@@ -9,6 +9,7 @@ import AuthenticationServices
 
 struct LoginSheetView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var appState: AppStateStore
     let onLoginSuccess: () -> Void
     
     var body: some View {
@@ -34,7 +35,7 @@ struct LoginSheetView: View {
                     case .success(let authorization):
                         Task { @MainActor in
                             handleAppleSignIn(authorization: authorization)
-                            UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                            appState.setIsLoggedIn(true)
                             onLoginSuccess()
                             dismiss()
                         }

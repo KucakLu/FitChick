@@ -11,55 +11,74 @@ import SwiftUI
 
 final class SoundManager {
     static let shared = SoundManager()
-    
-    private var player: AVAudioPlayer?
-    
-    private init() {}
-    
-    func playButtonSound() {
-        guard let asset = NSDataAsset(name: "ButtonSfx") else {
-            print("Sound assets not found: ButtonSfx")
-            return
-        }
-        
-        do {
-            player = try AVAudioPlayer(data: asset.data, fileTypeHint: "mp3")
-            player?.prepareToPlay()
-            player?.play()
-        } catch {
-            print ("Failed to play sound: \(error.localizedDescription)")
-        }
-    }
-    
-    func playGetPetSound() {
-        guard let asset = NSDataAsset(name: "GetPetSfx") else {
-            print("Sound assets not found: GetPetSfx")
-            return
-        }
-        
-        do {
-            player = try AVAudioPlayer(data: asset.data, fileTypeHint: "mp3")
-            player?.prepareToPlay()
-            player?.play()
-        } catch {
-            print ("Failed to play sound: \(error.localizedDescription)")
-        }
-    }
-    
-    func playGetRewardSound() {
-        guard let asset = NSDataAsset(name: "GetRewardSfx") else {
-            print("Sound assets not found: GetRewardSfx")
-            return
-        }
-        
-        do {
-            player = try AVAudioPlayer(data: asset.data, fileTypeHint: "mp3")
-            player?.prepareToPlay()
-            player?.play()
-        } catch {
-            print ("Failed to play sound: \(error.localizedDescription)")
-        }
-    }
-    
-}
 
+    private enum SoundEffect: String, CaseIterable {
+        case button = "ButtonSfx"
+        case getPet = "GetPetSfx"
+        case getReward = "GetRewardSfx"
+    }
+
+    private var players: [SoundEffect: AVAudioPlayer] = [:]
+
+    private init() {}
+
+    func preload() {
+        PerformanceProbe.measure("SoundPreload") {
+            SoundEffect.allCases.forEach { effect in
+                _ = player(for: effect)
+            }
+        }
+    }
+
+    func playButtonSound() {
+        PerformanceProbe.measure("SoundButton") {
+            play(.button)
+        }
+    }
+
+    func playGetPetSound() {
+        PerformanceProbe.measure("SoundGetPet") {
+            play(.getPet)
+        }
+    }
+
+    func playGetRewardSound() {
+        PerformanceProbe.measure("SoundGetReward") {
+            play(.getReward)
+        }
+    }
+
+    private func play(_ effect: SoundEffect) {
+        guard let player = player(for: effect) else {
+            return
+        }
+
+        if player.isPlaying {
+            player.stop()
+        }
+
+        player.currentTime = 0
+        player.play()
+    }
+
+    private func player(for effect: SoundEffect) -> AVAudioPlayer? {
+        if let player = players[effect] {
+            return player
+        }
+
+        guard let asset = NSDataAsset(name: effect.rawValue) else {
+            print("Sound assets not found: \(effect.rawValue)")
+            return nil
+        }
+
+        do {
+            let player = try AVAudioPlayer(data: asset.data, fileTypeHint: "mp3")
+            player.prepareToPlay()
+            players[effect] = player
+            return player
+        } catch {
+            print ("Failed to play sound: \(error.localizedDescription)")
+            return nil
+        }
+    }
+}

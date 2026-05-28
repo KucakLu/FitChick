@@ -10,29 +10,34 @@ import SwiftData
 
 struct DressUpPageView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var appState: AppStateStore
 
     @Query private var users: [UserAccount]
-    @AppStorage("coinCount") private var coinCount = 0
-    @AppStorage(EquippedPetItems.storageKey) private var equippedPetItemsStorage = EquippedPetItems.empty.encodedString
 
     @State private var draftEquippedItems: EquippedPetItems = .empty
-    @State private var navigateToDashboard = false
 
     private var savedEquippedItems: EquippedPetItems {
-        EquippedPetItems(encodedString: equippedPetItemsStorage)
-            .sanitizedForCurrentCatalog
+        appState.equippedPetItems.sanitizedForCurrentCatalog(
+            unlockedItems: appState.unlockedItems
+        )
     }
 
     private func initDraft() {
-        draftEquippedItems = savedEquippedItems
+        PerformanceProbe.measure("DressUpInitDraft") {
+            draftEquippedItems = savedEquippedItems
+        }
     }
 
     private func discardChangesAndDismiss() {
+        PerformanceProbe.event("RouteDressUpDismiss")
         dismiss()
     }
 
     private func saveDraftAndDismiss() {
-        equippedPetItemsStorage = draftEquippedItems.encodedString
+        PerformanceProbe.measure("DressUpSaveDraft") {
+            appState.setEquippedPetItems(draftEquippedItems)
+        }
+        PerformanceProbe.event("RouteDressUpSave")
         dismiss()
     }
 
@@ -88,9 +93,6 @@ struct DressUpPageView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
         .ignoresSafeArea(.container, edges: .bottom)
-        .fullScreenCover(isPresented: $navigateToDashboard) {
-            DashboardView()
-        }
     }
 
 
@@ -134,4 +136,5 @@ struct DraftPetPreviewCard: View {
 
     DressUpPageView()
         .modelContainer(container)
+        .environmentObject(AppStateStore.preview())
 }
