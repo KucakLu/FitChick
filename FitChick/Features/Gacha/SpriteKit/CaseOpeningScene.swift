@@ -43,6 +43,7 @@ final class CaseOpeningScene: SKScene {
     override func didMove(to view: SKView) {
         super.didMove(to: view)
 
+        PerformanceProbe.event("CaseSceneDidMove")
         view.allowsTransparency = true
         view.backgroundColor = .clear
         view.ignoresSiblingOrder = true
@@ -59,15 +60,21 @@ final class CaseOpeningScene: SKScene {
 
         phase = newPhase
 
-        switch newPhase {
-        case .closed:
-            showClosedCase()
-        case .shaking:
-            showClosedCase()
-            runActiveShakeAnimation()
-        case .open:
-            runOpenAnimation()
+        PerformanceProbe.measure("CaseSceneSetPhase") {
+            switch newPhase {
+            case .closed:
+                showClosedCase()
+            case .shaking:
+                showClosedCase()
+                runActiveShakeAnimation()
+            case .open:
+                runOpenAnimation()
+            }
         }
+    }
+
+    func setAnimation(isPlaying: Bool) {
+        isPaused = !isPlaying
     }
 
     private func configureScene() {
@@ -217,7 +224,13 @@ struct CaseOpeningAnimationView: View {
         .aspectRatio(CaseOpeningScene.referenceAspectRatio, contentMode: .fit)
         .background(Color.clear)
         .onAppear {
+            PerformanceProbe.event("CaseSceneViewAppear")
+            scene.setAnimation(isPlaying: true)
             scene.setPhase(phase)
+        }
+        .onDisappear {
+            PerformanceProbe.event("CaseSceneViewDisappear")
+            scene.setAnimation(isPlaying: false)
         }
         .onChange(of: phase) { _, newPhase in
             scene.setPhase(newPhase)

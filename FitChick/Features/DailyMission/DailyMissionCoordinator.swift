@@ -49,7 +49,7 @@ final class DailyMissionCoordinator {
     private var activeMissions: [String: ActiveMission] = [:]
     private var currentActivity: Activity<DailyMissionActivityAttributes>?
     private var activityTimeoutTasks: [String: Task<Void, Never>] = [:]
-    private var didRequestNotificationAuthorization = false
+    private static var didRequestNotificationAuthorization = false
 
     init(
         defaults: UserDefaults = .standard,
@@ -147,11 +147,11 @@ final class DailyMissionCoordinator {
     }
 
     private func requestNotificationAuthorizationIfNeeded() async {
-        guard didRequestNotificationAuthorization == false else {
+        guard Self.didRequestNotificationAuthorization == false else {
             return
         }
 
-        didRequestNotificationAuthorization = true
+        Self.didRequestNotificationAuthorization = true
         let settings = await notificationCenter.notificationSettings()
 
         guard settings.authorizationStatus == .notDetermined else {
@@ -159,7 +159,9 @@ final class DailyMissionCoordinator {
         }
 
         do {
-            _ = try await notificationCenter.requestAuthorization(options: [.alert, .sound, .badge])
+            _ = try await PerformanceProbe.measure("NotificationAuthorizationRequest") {
+                try await notificationCenter.requestAuthorization(options: [.alert, .sound, .badge])
+            }
         } catch {
             print("Daily mission notification authorization failed: \(error.localizedDescription)")
         }
@@ -332,18 +334,20 @@ final class DailyMissionCoordinator {
         }
 
         do {
-            currentActivity = try Activity.request(
-                attributes: DailyMissionActivityAttributes(
-                    missionID: missionID,
-                    kind: target.kind,
-                    targetValue: target.value,
-                    rewardCoin: target.rewardCoin,
-                    startedAt: Date(),
-                    duration: duration
-                ),
-                content: content,
-                pushType: nil
-            )
+            currentActivity = try PerformanceProbe.measure("LiveActivityRequest") {
+                try Activity.request(
+                    attributes: DailyMissionActivityAttributes(
+                        missionID: missionID,
+                        kind: target.kind,
+                        targetValue: target.value,
+                        rewardCoin: target.rewardCoin,
+                        startedAt: Date(),
+                        duration: duration
+                    ),
+                    content: content,
+                    pushType: nil
+                )
+            }
         } catch {
             print("Daily mission Live Activity failed: \(error.localizedDescription)")
         }
@@ -352,18 +356,16 @@ final class DailyMissionCoordinator {
     private func completeMission(_ mission: ActiveMission, currentValue: Double) async {
         activeMissions[mission.missionID] = nil
         cancelActivityTimeout(missionID: mission.missionID)
-        let rewardKey = "dailyMission.reward.\(mission.target.id)"
+        let rewardNotificationKey = "dailyMission.rewardNotification.\(mission.target.id)"
 
-        guard hasTriggeredToday(rewardKey) == false else {
+        guard hasTriggeredToday(rewardNotificationKey) == false else {
             if currentActivity?.attributes.missionID == mission.missionID {
                 await endCurrentActivity(clearActiveMissions: false)
             }
             return
         }
 
-        markTriggeredToday(rewardKey)
-        let updatedCoinCount = defaults.integer(forKey: "coinCount") + mission.target.rewardCoin
-        defaults.set(updatedCoinCount, forKey: "coinCount")
+        markTriggeredToday(rewardNotificationKey)
         await sendRewardLocalNotification(for: mission.target)
         await showCompletedActivity(for: mission, currentValue: currentValue)
     }
@@ -372,7 +374,7 @@ final class DailyMissionCoordinator {
         let completedState = DailyMissionActivityAttributes.ContentState(
             currentValue: currentValue,
             remainingValue: 0,
-            message: "You earn \(mission.target.rewardCoin) coin",
+            message: "Tekan Collect untuk claim \(mission.target.rewardCoin) coin",
             phase: .completed,
             updatedAt: Date()
         )
@@ -398,18 +400,20 @@ final class DailyMissionCoordinator {
         await endCurrentActivity(clearActiveMissions: false)
 
         do {
-            let completedActivity = try Activity.request(
-                attributes: DailyMissionActivityAttributes(
-                    missionID: mission.missionID,
-                    kind: mission.target.kind,
-                    targetValue: mission.target.value,
-                    rewardCoin: mission.target.rewardCoin,
-                    startedAt: Date(),
-                    duration: Constants.completedActivityDismissalDelay
-                ),
-                content: finalContent,
-                pushType: nil
-            )
+            let completedActivity = try PerformanceProbe.measure("LiveActivityCompletionRequest") {
+                try Activity.request(
+                    attributes: DailyMissionActivityAttributes(
+                        missionID: mission.missionID,
+                        kind: mission.target.kind,
+                        targetValue: mission.target.value,
+                        rewardCoin: mission.target.rewardCoin,
+                        startedAt: Date(),
+                        duration: Constants.completedActivityDismissalDelay
+                    ),
+                    content: finalContent,
+                    pushType: nil
+                )
+            }
             await completedActivity.end(
                 finalContent,
                 dismissalPolicy: .after(Date().addingTimeInterval(Constants.completedActivityDismissalDelay))
@@ -545,7 +549,9 @@ final class DailyMissionCoordinator {
         )
 
         do {
-            try await notificationCenter.add(request)
+            try await PerformanceProbe.measure("LocalNotificationSend") {
+                try await notificationCenter.add(request)
+            }
         } catch {
             print("Daily mission notification failed: \(error.localizedDescription)")
         }
@@ -554,8 +560,8 @@ final class DailyMissionCoordinator {
     private func sendRewardLocalNotification(for target: DailyMissionTarget) async {
         await sendLocalNotification(
             identifier: "dailyMission.reward.\(target.id).\(todayKey)",
-            title: "Mission complete!",
-            body: "You earn \(target.rewardCoin) coin 🎉"
+            title: "Reward siap di-claim!",
+            body: "Tekan Collect di Daily Progress untuk mengambil \(target.rewardCoin) coin."
         )
     }
 

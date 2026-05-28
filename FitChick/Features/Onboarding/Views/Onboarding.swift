@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct Onboarding: View {
-    @AppStorage("isLoggedIn") private var isLoggedIn = false
+    @EnvironmentObject private var router: AppRouter
+    @EnvironmentObject private var appState: AppStateStore
     
     private enum Screen {
         case splash
         case onboarding1
-        case dashboard
     }
     
     @State private var currentScreen: Screen = .splash
@@ -29,9 +29,6 @@ struct Onboarding: View {
                     }
             case .onboarding1:
                 Onboarding1()
-                    .transition(.opacity)
-            case .dashboard:
-                DashboardView()
                     .transition(.opacity)
             }
         }
@@ -60,9 +57,11 @@ struct Onboarding: View {
         try? await Task.sleep(nanoseconds: 3_000_000_000)
 
         withAnimation(.easeInOut(duration: 0.3)) {
-            if isLoggedIn {
-                currentScreen = .dashboard
+            if appState.isLoggedIn {
+                PerformanceProbe.event("RouteSplashToDashboard")
+                router.showDashboard()
             } else {
+                PerformanceProbe.event("RouteSplashToOnboarding")
                 currentScreen = .onboarding1
             }
         }
@@ -71,4 +70,6 @@ struct Onboarding: View {
 
 #Preview {
     Onboarding()
+        .environmentObject(AppRouter())
+        .environmentObject(AppStateStore.preview())
 }

@@ -8,10 +8,9 @@
 import SwiftUI
 
 struct RewardFiveItem: View {
+    @EnvironmentObject private var router: AppRouter
     @State private var isRotating = false
-    @Environment(\.dismiss) private var dismiss
     @State private var currentStep: Int = 0
-    @State private var navigateToDashboard: Bool = false
     
     let items: [CollectionItem]
     
@@ -60,9 +59,6 @@ struct RewardFiveItem: View {
                 CollectRewardButton(title: "Tap to collect") {
                     handleTapSequence()
                 }
-                .fullScreenCover(isPresented: $navigateToDashboard) {
-                    DashboardView()
-                }
                 .padding(.top, 20)
             }
         }
@@ -74,7 +70,8 @@ struct RewardFiveItem: View {
             if currentStep < items.count - 1 {
                 currentStep += 1
             } else {
-                navigateToDashboard = true
+                PerformanceProbe.event("RouteRewardFiveToDashboard")
+                router.showDashboard()
             }
         }
     }
@@ -84,4 +81,5 @@ struct RewardFiveItem: View {
     let sampleItems = Array(CollectionData.items.prefix(5))
     
     return RewardFiveItem(items: sampleItems)
+        .environmentObject(AppRouter())
 }

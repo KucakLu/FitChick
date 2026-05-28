@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RewardCoinRegister: View {
-    @AppStorage("coinCount") private var coinCount = 0    
+    @EnvironmentObject private var appState: AppStateStore
     @State private var isRotating: Bool = false
     @State private var navigateToHatchView: Bool = false
     
@@ -32,7 +32,8 @@ struct RewardCoinRegister: View {
                 .padding(.bottom, 120)
                 
                 Button {
-                    coinCount += 60
+                    appState.addCoins(60)
+                    PerformanceProbe.event("RouteRegisterRewardToHatch")
                     navigateToHatchView = true
                 } label: {
                     Text("Tap to collect the coin")
@@ -49,4 +50,5 @@ struct RewardCoinRegister: View {
 
 #Preview {
     RewardCoinRegister()
+        .environmentObject(AppStateStore.preview())
 }

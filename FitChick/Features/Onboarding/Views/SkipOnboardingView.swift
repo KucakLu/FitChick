@@ -106,6 +106,7 @@ struct SkipOnboardingView: View {
             guard shouldNavigateToConnectHealth else { return }
 
             shouldNavigateToConnectHealth = false
+            PerformanceProbe.event("RouteSkipToConnectHealth")
             navigateToConnectHealth = true
         }) {
             LoginSheetView {

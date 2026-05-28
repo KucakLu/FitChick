@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct RewardItem: View {
+    @EnvironmentObject private var router: AppRouter
     @State private var isRotating: Bool = true
-    @State private var navigateToDashboard: Bool = false
     
     let item: CollectionItem
     let onCollect: (() -> Void)?
@@ -56,11 +56,9 @@ struct RewardItem: View {
                     if let onCollect {
                         onCollect()
                     } else {
-                        navigateToDashboard = true
+                        PerformanceProbe.event("RouteRewardToDashboard")
+                        router.showDashboard()
                     }
-                }
-                .fullScreenCover(isPresented: $navigateToDashboard) {
-                    DashboardView()
                 }
                 .padding(.top, 20)
             }
@@ -76,4 +74,5 @@ struct RewardItem: View {
     let sampleItem = CollectionData.items[0]
     
     return RewardItem(item: sampleItem)
+        .environmentObject(AppRouter())
 }

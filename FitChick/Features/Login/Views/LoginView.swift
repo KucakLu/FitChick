@@ -40,6 +40,7 @@ struct LoginView: View {
             guard shouldNavigateToConnectHealth else { return }
 
             shouldNavigateToConnectHealth = false
+            PerformanceProbe.event("RouteLoginToConnectHealth")
             navigateToConnectHealth = true
         }) {
             LoginSheetView {

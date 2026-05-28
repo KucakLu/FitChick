@@ -9,11 +9,15 @@ import SwiftUI
 
 struct CollectionView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var router: AppRouter
+    @EnvironmentObject private var appState: AppStateStore
     
-    @State private var items: [CollectionItem] = CollectionData.items.sorted {
-        CollectionData.isItemOwned($0) && !CollectionData.isItemOwned($1)
+    private var items: [CollectionItem] {
+        CollectionData.items.sorted {
+            CollectionData.isItemOwned($0, unlockedItems: appState.unlockedItems)
+                && !CollectionData.isItemOwned($1, unlockedItems: appState.unlockedItems)
+        }
     }
-    @State private var navigateToDashboard = false
     
     private let columns = [
         GridItem(.fixed(100), spacing: 16),
@@ -22,7 +26,9 @@ struct CollectionView: View {
     ]
     
     private var ownedCountText: String {
-        let ownedCount = items.filter { CollectionData.isItemOwned($0) }.count
+        let ownedCount = items.filter {
+            CollectionData.isItemOwned($0, unlockedItems: appState.unlockedItems)
+        }.count
         return "\(ownedCount)/\(items.count)"
     }
     
@@ -46,7 +52,8 @@ struct CollectionView: View {
                     Spacer()
                     
                     IconButton(icon: Image(systemName: "house.fill")) {
-                        navigateToDashboard = true
+                        PerformanceProbe.event("RouteCollectionToDashboard")
+                        router.showDashboard()
                     }
                 }
                 .padding(.horizontal, 24)
@@ -56,7 +63,10 @@ struct CollectionView: View {
                     LazyVGrid(columns: columns, spacing: 20) {
                         ForEach(items) { item in
                             
-                            let isUnlocked = CollectionData.isItemOwned(item)
+                            let isUnlocked = CollectionData.isItemOwned(
+                                item,
+                                unlockedItems: appState.unlockedItems
+                            )
                             let buttonState: ItemState = isUnlocked ? .normal : .locked
                             
                             ItemGridButton(svgAssetName: item.svgAssetName, state: buttonState) {
@@ -71,12 +81,11 @@ struct CollectionView: View {
             }
         }
         .navigationBarHidden(true)
-        .fullScreenCover(isPresented: $navigateToDashboard) {
-            DashboardView()
-        }
     }
 }
 
 #Preview {
     CollectionView()
+        .environmentObject(AppRouter())
+        .environmentObject(AppStateStore.preview())
 }

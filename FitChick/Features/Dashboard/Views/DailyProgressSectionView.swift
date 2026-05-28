@@ -8,15 +8,15 @@
 import SwiftUI
 
 struct DailyProgressSectionView: View {
-    @AppStorage("coinCount") private var coinCount = 0
-    @AppStorage("dailyProgress.collectedRewardIDs") private var collectedRewardIDsStorage = ""
-    @AppStorage("dailyProgress.collectedRewardDate") private var collectedRewardDate = ""
+    @EnvironmentObject private var appState: AppStateStore
 
     let stepCount: Int
+    let stepGoalMin: Int
     let stepGoalFine: Int
     let stepGoalGood: Int
     let stepGoalExcellent: Int
     let distanceCount: Double
+    let distanceGoalMin: Double
     let distanceGoalFine: Double
     let distanceGoalGood: Double
     let distanceGoalExcellent: Double
@@ -109,6 +109,7 @@ struct DailyProgressSectionView: View {
 
     private var stepGoals: [DailyProgressGoal] {
         [
+            DailyProgressGoal(kind: .step, currentValue: Double(stepCount), targetValue: Double(stepGoalMin), rewardAmount: rewardAmount),
             DailyProgressGoal(kind: .step, currentValue: Double(stepCount), targetValue: Double(stepGoalFine), rewardAmount: rewardAmount),
             DailyProgressGoal(kind: .step, currentValue: Double(stepCount), targetValue: Double(stepGoalGood), rewardAmount: rewardAmount),
             DailyProgressGoal(kind: .step, currentValue: Double(stepCount), targetValue: Double(stepGoalExcellent), rewardAmount: rewardAmount)
@@ -117,6 +118,7 @@ struct DailyProgressSectionView: View {
 
     private var distanceGoals: [DailyProgressGoal] {
         [
+            DailyProgressGoal(kind: .distance, currentValue: distanceCount, targetValue: distanceGoalMin, rewardAmount: rewardAmount),
             DailyProgressGoal(kind: .distance, currentValue: distanceCount, targetValue: distanceGoalFine, rewardAmount: rewardAmount),
             DailyProgressGoal(kind: .distance, currentValue: distanceCount, targetValue: distanceGoalGood, rewardAmount: rewardAmount),
             DailyProgressGoal(kind: .distance, currentValue: distanceCount, targetValue: distanceGoalExcellent, rewardAmount: rewardAmount)
@@ -131,14 +133,6 @@ struct DailyProgressSectionView: View {
         distanceGoals.filter { !isCollected($0) }
     }
 
-    private var collectedRewardIDs: Set<String> {
-        guard collectedRewardDate == todayKey else {
-            return []
-        }
-
-        return Set(collectedRewardIDsStorage.split(separator: ",").map(String.init))
-    }
-
     private func collectReward(for goal: DailyProgressGoal) {
         guard goal.isComplete else {
             return
@@ -149,26 +143,16 @@ struct DailyProgressSectionView: View {
             return
         }
 
-        coinCount += goal.rewardAmount
+        appState.addCoins(goal.rewardAmount)
         markRewardCollected(for: goal)
     }
 
     private func markRewardCollected(for goal: DailyProgressGoal) {
-        var updatedRewardIDs = collectedRewardIDs
-        updatedRewardIDs.insert(goal.id)
-
-        collectedRewardDate = todayKey
-        collectedRewardIDsStorage = updatedRewardIDs.sorted().joined(separator: ",")
-        UserDefaults.standard.set(todayKey, forKey: rewardStorageKey(for: goal))
+        appState.markDailyRewardCollected(id: goal.id, todayKey: todayKey)
     }
 
     private func isCollected(_ goal: DailyProgressGoal) -> Bool {
-        collectedRewardIDs.contains(goal.id)
-            || UserDefaults.standard.string(forKey: rewardStorageKey(for: goal)) == todayKey
-    }
-
-    private func rewardStorageKey(for goal: DailyProgressGoal) -> String {
-        "dailyMission.reward.\(goal.id)"
+        appState.isDailyRewardCollected(id: goal.id, todayKey: todayKey)
     }
 
     private var todayKey: String {
@@ -221,12 +205,15 @@ private struct DailyProgressGoal: Identifiable {
 #Preview {
     DailyProgressSectionView(
         stepCount: 2400,
+        stepGoalMin: 4000,
         stepGoalFine: 8000,
         stepGoalGood: 10000,
         stepGoalExcellent: 12000,
         distanceCount: 2.3,
+        distanceGoalMin: 3,
         distanceGoalFine: 6,
         distanceGoalGood: 8,
         distanceGoalExcellent: 10
     )
+    .environmentObject(AppStateStore.preview())
 }

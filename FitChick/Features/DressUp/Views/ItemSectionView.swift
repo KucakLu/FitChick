@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct ItemSectionView: View {
+    @EnvironmentObject private var appState: AppStateStore
     @Binding var equippedItems: EquippedPetItems
-    @AppStorage(CollectionData.unlockedStorageKey) private var unlockedStorageString = "{}"
 
     private var unlockedAssetNames: [String] {
-        UnlockedItems(encodedString: unlockedStorageString).assetNames
+        appState.unlockedItems.assetNames
     }
 
     private var items: [CollectionItem] {
@@ -93,6 +93,7 @@ private struct ItemSectionPreview: View {
             AppColor.dashboardBackground.ignoresSafeArea()
 
             ItemSectionView(equippedItems: $equippedItems)
+                .environmentObject(AppStateStore.preview())
         }
     }
 }
